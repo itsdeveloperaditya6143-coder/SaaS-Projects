@@ -7,6 +7,15 @@ FRONTEND_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "fr
 app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path="")
 
 
+@app.after_request
+def add_cors_headers(response):
+    # Allow the deployed frontend (Render Static Site) to call /api/*
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    return response
+
+
 @app.route("/")
 def home():
     return send_from_directory(FRONTEND_DIR, "index.html")

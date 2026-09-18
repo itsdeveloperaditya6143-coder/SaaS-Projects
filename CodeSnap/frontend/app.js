@@ -1,4 +1,13 @@
 // CodeSnap v2.0 PRODUCTION - simple by default, powerful in Advanced
+// Backend API (deployed on Render)
+const BACKEND_URL = 'https://codesnap-backend-2uj9.onrender.com';
+
+// Optional: ping backend on load (non-blocking, app works fully offline without it)
+fetch(`${BACKEND_URL}/api/health`)
+  .then((r) => r.json())
+  .then((d) => console.log('CodeSnap backend:', d))
+  .catch(() => console.log('Backend sleeping/offline - continuing client-side only'));
+
 const THEMES = [
   { id:'dracula', name:'Dracula', desc:'dark • purple', cat:'dark', bg:'linear-gradient(135deg,#282a36,#44475a)', card:'#282a36', color:'#f8f8f2', title:'rgba(255,255,255,.06)', light:false },
   { id:'monokai', name:'Monokai', desc:'dark • classic', cat:'dark', bg:'linear-gradient(135deg,#272822,#3e3d32)', card:'#272822', color:'#f8f8f2', title:'rgba(255,255,255,.06)', light:false },
