@@ -1,6 +1,7 @@
 // CodeSnap service worker - offline app shell
-const CACHE = 'codesnap-v1';
-const ASSETS = ['/', '/static/style.css', '/static/app.js', '/static/manifest.json'];
+// Works both as Render Static Site (frontend/) and via Flask backend
+const CACHE = 'codesnap-v2';
+const ASSETS = ['./', './index.html', './style.css', './app.js', './manifest.json'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
