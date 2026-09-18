@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0e14" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="CodeSnap" />
+<meta name="description" content="Turn code into beautiful shareable images in 3 seconds. Free, no login." />
+<title>CodeSnap - Turn Code into Beautiful Images</title>
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192.png') }}" />
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link id="hljs-theme" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Fira+Code:wght@400;600&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">⚡ CodeSnap</div>
+  <div class="tagline">Week 2 #buildinpublic by Aditya • Code to image in 3 seconds</div>
+  <button id="installBtn" class="install-btn" style="display:none">📲 Install</button>
+  <a class="pill" href="/" onclick="return false;">v1.0 free • no login</a>
+</header>
+
+<main class="layout">
+  <section class="controls">
+    <div class="card">
+      <div class="step"><span class="num">1</span> Your code</div>
+      <textarea id="codeInput" spellcheck="false" maxlength="20000" placeholder="Paste your code here...">def hello():
+    print("Small steps every day compound into massive results 🚀")
+
+hello()</textarea>
+      <div class="row between small muted">
+        <span>Keep it short — perfect for X.</span>
+        <span><span id="lineCount">4</span> lines • <span id="charCount">0</span>/20000</span>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>Language <button id="sampleBtn" type="button" class="mini-btn">✨ sample</button></label>
+          <div class="lang-select">
+            <button type="button" id="langBtn" class="lang-btn">
+              <span id="langIcon" class="lang-icon">🐍</span>
+              <span id="langName">Python</span>
+              <span class="chev">▾</span>
+            </button>
+            <div id="langMenu" class="lang-menu"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>File name</label>
+          <input id="fileName" value="main.py" maxlength="40" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step"><span class="num">2</span> Style</div>
+      <div class="muted small">Pick a theme:</div>
+      <div class="filters">
+        <button class="filter active" data-filter="all">All (36)</button>
+        <button class="filter" data-filter="dark">Dark (16)</button>
+        <button class="filter" data-filter="light">Light (6)</button>
+        <button class="filter" data-filter="gradient">Gradient (14)</button>
+      </div>
+      <div id="themeGrid" class="theme-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="step"><span class="num">3</span> Customize design <span class="live-dot">● live</span></div>
+      <div class="muted small">Every change shows instantly on the right — no scrolling needed.</div>
+      <div class="adv-group">
+        <label>Font</label>
+        <div class="seg" id="fontSeg">
+          <button type="button" data-font="'JetBrains Mono',monospace" class="active">JetBrains</button>
+          <button type="button" data-font="'Fira Code',monospace">Fira</button>
+          <button type="button" data-font="Consolas,monospace">Consolas</button>
+        </div>
+      </div>
+      <div class="sliders2">
+        <div><label>Font size <b id="fontVal">15px</b></label><input type="range" id="fontSize" min="12" max="24" value="15"></div>
+        <div><label>Padding <b id="padVal">48px</b></label><input type="range" id="padding" min="16" max="120" value="48"></div>
+        <div><label>Corners <b id="radiusVal">14px</b></label><input type="range" id="radius" min="0" max="28" value="14"></div>
+        <div><label>Line height <b id="lhVal">1.6</b></label><input type="range" id="lineHeight" min="12" max="20" value="16"></div>
+      </div>
+      <div class="adv-group">
+        <label>Shadow</label>
+        <div class="seg" id="shadowSeg">
+          <button type="button" data-shadow="none">None</button>
+          <button type="button" data-shadow="soft">Soft</button>
+          <button type="button" data-shadow="deep" class="active">Deep</button>
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px"><label>Watermark text</label><input id="waterText" value="Made with CodeSnap" maxlength="40" /></div>
+      <label class="toggle"><span>Mac window dots</span><input type="checkbox" id="optDots" checked><i></i></label>
+      <label class="toggle"><span>Line numbers</span><input type="checkbox" id="optLines" checked><i></i></label>
+      <label class="toggle"><span>Title bar</span><input type="checkbox" id="optTitle" checked><i></i></label>
+      <label class="toggle"><span>Watermark</span><input type="checkbox" id="optWater" checked><i></i></label>
+      <label class="toggle"><span>Wrap long lines (recommended)</span><input type="checkbox" id="optWrap" checked><i></i></label>
+    </div>
+  </section>
+
+  <section class="preview">
+    <div class="preview-sticky">
+    <div class="card export-card">
+      <div class="step"><span class="live-pulse"></span> Live preview & export</div>
+      <div class="status-row">
+        <span id="statusPill" class="status-pill ok"><span class="dot"></span><span id="statusText">4 lines • Ready</span></span>
+        <span class="muted small">Theme: <b id="themeName">Dracula</b> • <span id="hlStatus">python ✓</span></span>
+      </div>
+
+      <div id="snapBg" class="snap-bg">
+        <div id="snapCard" class="snap-card">
+          <div id="titleBar" class="titlebar">
+            <div id="dots" class="dots"><span></span><span></span><span></span></div>
+            <div class="filelabel"><span id="langBadge">🐍</span> <span id="fileLabel">main.py</span></div>
+            <div style="width:52px"></div>
+          </div>
+          <div class="code-wrap">
+            <div id="lineNums" class="linenums"></div>
+            <pre id="preOut"><code id="codeOut" class="language-python"></code></pre>
+          </div>
+          <div id="watermark" class="watermark">Made with CodeSnap</div>
+        </div>
+      </div>
+
+      <button id="splitHint" class="split-hint" style="display:none">🧵 Long code? Split into <b id="splitCount">2</b> images for thread →</button>
+      <button id="widthHint" class="split-hint width-hint" style="display:none">↔️ <span id="widthText">Line too wide — will be cut</span> <b>• Tap to Fit →</b></button>
+
+      <div class="export-actions">
+        <button id="downloadBtn" class="btn primary big"><span id="dlLabel">⬇ Download PNG</span></button>
+        <button id="copyBtn" class="btn ghost">Copy</button>
+      </div>
+
+      <details id="exportAdv" class="adv">
+        <summary><span>⚙️ Advanced export</span><span class="chev">▾</span></summary>
+        <div class="adv-body">
+          <div class="adv-group">
+            <label>Quality (auto picks best to avoid crash)</label>
+            <div class="seg" id="scaleSeg">
+              <button type="button" data-scale="auto" class="active">Auto ✨</button>
+              <button type="button" data-scale="1">1x</button>
+              <button type="button" data-scale="2">2x</button>
+              <button type="button" data-scale="3">3x</button>
+            </div>
+          </div>
+          <div><label>Split: lines per image <b id="splitVal">35</b></label><input type="range" id="splitLines" min="15" max="60" value="35"></div>
+          <label class="toggle"><span>Transparent background (no gradient)</span><input type="checkbox" id="optTransparent"><i></i></label>
+          <button id="splitBtn" class="btn ghost full">✂️ Split & download parts</button>
+          <div class="muted small" style="margin-top:8px">Tip: under 50 lines = 1 perfect image. Over 80 = split works best for X.</div>
+        </div>
+      </details>
+
+      <div id="toast" class="toast"></div>
+    </div>
+    <div class="footer">Built with Python + HTML/CSS/JS • Free • No login • #buildinpublic Week 2</div>
+    </div>
+  </section>
+</main>
+
+<!-- Mobile install banner + bottom app nav -->
+<div id="installBanner" class="install-banner" style="display:none">
+  <img src="{{ url_for('static', filename='icons/icon-192.png') }}" alt="CodeSnap" />
+  <div><b>Install CodeSnap</b><span>Add to home screen • works offline</span></div>
+  <button id="installBtn2">Install</button>
+  <button id="installClose" aria-label="Close">✕</button>
+</div>
+<nav class="tabbar">
+  <a href="#codeInput" class="active">✏️<span>Code</span></a>
+  <a href="#themeGrid">🎨<span>Style</span></a>
+  <a href="#snapBg">👁️<span>Preview</span></a>
+  <a href="#downloadBtn">⬇️<span>Export</span></a>
+</nav>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
