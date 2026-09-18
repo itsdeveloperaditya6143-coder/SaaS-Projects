@@ -26,8 +26,9 @@
 </header>
 
 <main class="layout">
-  <section class="controls">
-    <div class="card">
+  <div class="mobile-hint"><span class="dots3">◀ ▶</span> swipe cards to style — preview stays live above <span class="dots3">◀ ▶</span></div>
+  <section class="controls" id="controlsStrip">
+    <div class="card" id="cardCode">
       <div class="step"><span class="num">1</span> Your code</div>
       <textarea id="codeInput" spellcheck="false" maxlength="20000" placeholder="Paste your code here...">def hello():
     print("Small steps every day compound into massive results 🚀")
@@ -56,7 +57,7 @@ hello()</textarea>
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="cardStyle">
       <div class="step"><span class="num">2</span> Style</div>
       <div class="muted small">Pick a theme:</div>
       <div class="filters">
@@ -68,9 +69,9 @@ hello()</textarea>
       <div id="themeGrid" class="theme-grid"></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="cardCustomize">
       <div class="step"><span class="num">3</span> Customize design <span class="live-dot">● live</span></div>
-      <div class="muted small">Every change shows instantly on the right — no scrolling needed.</div>
+      <div class="muted small">Every change shows instantly above — no scrolling needed.</div>
       <div class="adv-group">
         <label>Font</label>
         <div class="seg" id="fontSeg">
@@ -168,10 +169,10 @@ hello()</textarea>
   <button id="installClose" aria-label="Close">✕</button>
 </div>
 <nav class="tabbar">
-  <a href="#codeInput" class="active">✏️<span>Code</span></a>
-  <a href="#themeGrid">🎨<span>Style</span></a>
-  <a href="#snapBg">👁️<span>Preview</span></a>
-  <a href="#downloadBtn">⬇️<span>Export</span></a>
+  <a href="#cardCode" data-tab="code" class="active">✏️<span>Code</span></a>
+  <a href="#cardStyle" data-tab="style">🎨<span>Style</span></a>
+  <a href="#snapBg" data-tab="preview">👁️<span>Preview</span></a>
+  <a href="#downloadBtn" data-tab="export">⬇️<span>Export</span></a>
 </nav>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>

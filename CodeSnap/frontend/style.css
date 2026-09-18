@@ -124,19 +124,37 @@ pre code { line-height: 1.6; background: transparent !important; white-space: pr
 .install-banner #installBtn2 { background: linear-gradient(135deg,#8b5cf6,#ec4899); border: none; color: #fff; font-weight: 800; border-radius: 12px; padding: 10px 16px; cursor: pointer; }
 .install-banner #installClose { background: transparent; border: none; color: #9aa3b2; font-size: 16px; cursor: pointer; padding: 6px; }
 .tabbar { display: none; }
+.mobile-hint { display: none; }
 
 @media (max-width: 980px) {
-  body { height: auto; overflow: auto; display: block; padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
-  .topbar { height: 56px; padding: 0 14px; }
-  .layout { grid-template-columns: 1fr; height: auto; overflow: visible; padding: 12px; gap: 12px; }
-  .controls, .preview { height: auto; overflow: visible; }
+  /* MOBILE APP-LIKE: preview fixed on top, controls swipe horizontally below.
+     No vertical page scroll — same logic as desktop (left scrolls, right fixed),
+     but stacked: top fixed, bottom horizontal swipe. */
+  body { height: 100dvh; overflow: hidden; display: flex; flex-direction: column; padding-bottom: 0; }
+  .topbar { height: 56px; padding: 0 14px; flex-shrink: 0; }
+  .tagline { display: none; }
+  .layout { display: flex; flex-direction: column; height: calc(100dvh - 56px - 64px); max-height: calc(100dvh - 56px - 64px); overflow: hidden; padding: 10px 10px 8px; gap: 8px; }
+  /* 1. Preview on TOP, always visible */
+  .preview { order: -1; flex-shrink: 0; height: auto; max-height: 46%; overflow-y: auto; overflow-x: hidden; padding: 0 2px 2px 0; }
   .preview-sticky { position: static; }
-  .tagline { display: none; } .theme-grid { grid-template-columns: 1fr 1fr 1fr; max-height: 260px; }
+  .export-card { margin-bottom: 0; padding: 12px; }
+  .snap-bg { padding: 16px; min-height: 160px; }
+  .snap-card { max-width: 100%; }
+  .code-wrap { max-height: 170px; }
+  pre { max-height: 150px; }
+  /* swipe hint between preview and controls */
+  .mobile-hint { order: 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11.5px; font-weight: 700; color: #9aa3b2; flex-shrink: 0; padding: 1px 0; user-select: none; }
+  .mobile-hint .dots3 { letter-spacing: 3px; color: #a855f7; }
+  /* 2. Controls HORIZONTAL swipe strip at bottom */
+  .controls { order: 1; flex: 1; min-height: 0; height: auto; display: flex; flex-direction: row; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding: 2px 2px 8px; scrollbar-width: none; }
+  .controls::-webkit-scrollbar { display: none; }
+  .controls .card { min-width: 86vw; max-width: 86vw; flex-shrink: 0; scroll-snap-align: center; scroll-snap-stop: always; margin-bottom: 0; overflow-y: auto; overflow-x: hidden; max-height: 100%; -webkit-overflow-scrolling: touch; }
+  .theme-grid { grid-template-columns: 1fr 1fr 1fr; max-height: 30vh; }
+  textarea { min-height: 110px; }
   .export-actions { flex-direction: row; } .btn { min-height: 48px; font-size: 15px; }
-  .snap-bg { padding: 20px; min-height: 280px; } .snap-card { max-width: 100%; }
   .sliders2 { grid-template-columns: 1fr 1fr; }
   .tabbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 150; background: rgba(13,17,25,.96); backdrop-filter: blur(12px); border-top: 1px solid #1f2430; padding: 8px 4px calc(8px + env(safe-area-inset-bottom)); }
   .tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #9aa3b2; text-decoration: none; font-size: 18px; padding: 6px; border-radius: 10px; }
   .tabbar a span { font-size: 10px; font-weight: 700; } .tabbar a.active { color: #c4b5fd; }
 }
-@media (max-width: 480px) { .theme-grid { grid-template-columns: 1fr 1fr; } .sliders2 { grid-template-columns: 1fr; } .export-actions { flex-direction: column; } }
+@media (max-width: 480px) { .theme-grid { grid-template-columns: 1fr 1fr; } .sliders2 { grid-template-columns: 1fr; } .export-actions { flex-direction: row; } .controls .card { min-width: 88vw; max-width: 88vw; } .preview { max-height: 44%; } }

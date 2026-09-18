@@ -333,7 +333,60 @@ async function doInstall(){
 ['installBtn','installBtn2'].forEach(id=>{ const b=document.getElementById(id); if(b) b.onclick=doInstall; });
 const ic=document.getElementById('installClose'); if(ic) ic.onclick=()=>showInstallUI(false);
 window.addEventListener('appinstalled', ()=>showInstallUI(false));
-// mobile tabbar active state
-document.querySelectorAll('.tabbar a').forEach(a=>a.addEventListener('click', ()=>{
+// mobile tabbar: swipe-strip navigation (mobile) + anchor fallback (desktop)
+function isMobileLayout(){ return window.matchMedia('(max-width: 980px)').matches; }
+function scrollToCard(id){
+  const strip = document.getElementById('controlsStrip');
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (isMobileLayout() && strip) {
+    strip.scrollTo({ left: el.offsetLeft - 10, behavior: 'smooth' });
+  } else {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+document.querySelectorAll('.tabbar a').forEach(a=>a.addEventListener('click', (e)=>{
+  e.preventDefault();
   document.querySelectorAll('.tabbar a').forEach(x=>x.classList.remove('active')); a.classList.add('active');
+  const tab = a.dataset.tab;
+  if (tab === 'code') scrollToCard('cardCode');
+  else if (tab === 'style') scrollToCard('cardStyle');
+  else if (tab === 'preview') {
+    // preview is always visible on top in mobile — flash it + ensure top
+    const pv = document.querySelector('.preview');
+    if (pv) pv.scrollTo ? pv.scrollTo({ top: 0, behavior: 'smooth' }) : null;
+    const sb = document.getElementById('snapBg');
+    if (sb) { sb.style.transition = 'box-shadow .3s'; sb.style.boxShadow = '0 0 0 3px #a855f7'; setTimeout(()=>sb.style.boxShadow='', 700); }
+  }
+  else if (tab === 'export') {
+    // download buttons live inside the top preview pane — scroll preview to them
+    const pv = document.querySelector('.preview');
+    const dl = document.getElementById('downloadBtn');
+    if (pv && dl) pv.scrollTo({ top: pv.scrollHeight, behavior: 'smooth' });
+    else if (dl) dl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
 }));
+// swipe spy: highlight active tab while user swipes cards
+(function(){
+  const strip = document.getElementById('controlsStrip');
+  if (!strip) return;
+  let tick = null;
+  strip.addEventListener('scroll', ()=>{
+    if (!isMobileLayout() || tick) return;
+    tick = setTimeout(()=>{
+      tick = null;
+      const cards = ['cardCode','cardStyle','cardCustomize'];
+      let best = 0, bestDist = Infinity;
+      cards.forEach((id, i)=>{
+        const el = document.getElementById(id);
+        if (!el) return;
+        const d = Math.abs((el.offsetLeft - 10) - strip.scrollLeft);
+        if (d < bestDist) { bestDist = d; best = i; }
+      });
+      const map = ['code','style','style'];
+      // cardCode -> Code, cardStyle + cardCustomize -> Style (both are styling)
+      const tabForCard = map[best] || 'code';
+      document.querySelectorAll('.tabbar a').forEach(x=>x.classList.toggle('active', x.dataset.tab === tabForCard));
+    }, 80);
+  }, { passive: true });
+})();
