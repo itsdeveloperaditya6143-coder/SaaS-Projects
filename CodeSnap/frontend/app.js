@@ -123,7 +123,7 @@ const LANGUAGES = [
 
 let currentTheme = THEMES.find(t => t.id === 'light');
 let currentLang = LANGUAGES[0];
-const settings = { font:"'JetBrains Mono',monospace", fontSize:13, padding:14, radius:10, lineHeight:1.3, shadow:'deep', quality:'fhd', splitPer:35 };
+const settings = { font:"'JetBrains Mono',monospace", fontSize:13, padding:48, radius:10, lineHeight:1.3, shadow:'deep', quality:'fhd', splitPer:35 };
 
 // HD / Full HD / 4K / 8K = PNG width-targeted export. 8K = max sharpness, zero blur on zoom.
 const QUALITY_TARGETS = {
@@ -478,6 +478,13 @@ $('splitBtn').onclick=async()=>{
 };
 
 renderThemes(document.querySelector('.filter.active')?.dataset.filter || 'light'); renderLangMenu(); setLanguage('python', false); applyTheme(); updateQualityHint(); setLoading(false);
+
+// Mobile-only padding override: default 14px, min 5px
+if(isMobileLayout()){
+  settings.padding=14;
+  $('padding').min='5'; $('padding').value='14'; $('padVal').textContent='14px';
+  applyTheme();
+}
 
 // --- PWA: service worker + install as app ---
 if ('serviceWorker' in navigator) {
