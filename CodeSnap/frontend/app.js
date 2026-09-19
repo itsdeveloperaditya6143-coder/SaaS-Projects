@@ -192,10 +192,38 @@ function doHighlight(text, hljsLang) {
 }
 function scheduleUpdate(){ clearTimeout(debounceT); debounceT = setTimeout(updateCode, 120); }
 
+// visual line counting: when wrap is on, long lines create extra rows
+function getCharsPerLine(){
+  const pre=$('preOut');
+  if(!pre||!pre.clientWidth) return 80;
+  const codeW=pre.clientWidth-12;
+  const charW=settings.fontSize*0.6;
+  return Math.max(20,Math.floor(codeW/charW));
+}
+function countVisualLines(text){
+  const raw=text.split('\n');
+  const cpl=getCharsPerLine();
+  let n=0;
+  for(const l of raw) n+=Math.max(1,Math.ceil((l.length||1)/cpl));
+  return n;
+}
+function buildLineNums(text){
+  const raw=text.split('\n');
+  const cpl=getCharsPerLine();
+  const nums=[];
+  for(let i=0;i<raw.length;i++){
+    const rows=Math.max(1,Math.ceil((raw[i].length||1)/cpl));
+    for(let j=0;j<rows;j++) nums.push(j===0?String(i+1):'');
+  }
+  return nums;
+}
+
 function updateCode() {
   let text = codeInput.value || '// paste code...';
   if (text.length > 20000) { text = text.slice(0,20000); codeInput.value = text; toast('Trimmed to 20k chars for stability'); }
-  const lines = text.split('\n').length;
+  const rawLines = text.split('\n').length;
+  const wrap = $('optWrap').checked;
+  const lines = wrap ? countVisualLines(text) : rawLines;
   $('lineCount').textContent = lines; $('charCount').textContent = text.length;
   $('fileLabel').textContent = $('fileName').value || 'untitled.txt';
   $('watermark').textContent = $('waterText').value || 'Made with CodeSnap';
@@ -209,18 +237,21 @@ function updateCode() {
   $('splitVal').textContent = settings.splitPer;
   snapBg.style.padding = settings.padding + 'px';
 
-  if ($('optLines').checked) { $('lineNums').style.display = 'block'; $('lineNums').innerHTML = Array.from({length: lines}, (_,i)=> i+1).join('<br>'); }
+  if ($('optLines').checked) {
+    $('lineNums').style.display = 'block';
+    const nums = wrap ? buildLineNums(text) : Array.from({length:rawLines},(_,i)=>String(i+1));
+    $('lineNums').innerHTML = nums.map(n=>n||'&nbsp;').join('<br>');
+  }
   else $('lineNums').style.display = 'none';
   $('dots').style.visibility = $('optDots').checked ? 'visible' : 'hidden';
   $('titleBar').style.display = $('optTitle').checked ? 'flex' : 'none';
   $('watermark').style.display = $('optWater').checked ? 'block' : 'none';
-  const wrap = $('optWrap').checked;
   codeOut.style.whiteSpace = wrap ? 'pre-wrap' : 'pre'; codeOut.style.wordBreak = wrap ? 'break-word' : 'normal';
 
   // smart friendly status (no scary red)
   const pill = $('statusPill'), st = $('statusText'), hint = $('splitHint');
   if (lines <= 50) { pill.className = 'status-pill ok'; st.textContent = `${lines} lines • Ready for HD`; hint.style.display = 'none'; }
-  else { pill.className = 'status-pill warn'; st.textContent = `${lines} lines • Split recommended`; hint.style.display = 'block'; $('splitCount').textContent = Math.ceil(lines / settings.splitPer); }
+  else { pill.className = 'status-pill warn'; st.textContent = `${lines} lines • Split recommended`; hint.style.display = 'block'; $('splitCount').textContent = Math.ceil(rawLines / settings.splitPer); }
   syncScroll();
   requestAnimationFrame(checkWidthOverflow);
 }
