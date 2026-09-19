@@ -144,7 +144,7 @@ function renderThemes(filter='all') {
     const d = document.createElement('div');
     d.className = 'theme' + (t.id===currentTheme.id ? ' active' : '');
     d.innerHTML = `<div class="swatch" style="background:${t.bg}"></div><div class="tname">${t.name}</div><div class="tdesc">${t.desc}</div>`;
-    d.onclick = () => { currentTheme = t; renderThemes(document.querySelector('.filter.active').dataset.filter); applyTheme(); };
+    d.onclick = () => { currentTheme = t; renderThemes(document.querySelector('.filter.active').dataset.filter); applyTheme(); if(typeof gtag==='function') gtag('event','theme_change',{theme_name:t.name,theme_cat:t.cat}); };
     grid.appendChild(d);
   });
 }
@@ -162,6 +162,7 @@ function renderLangMenu() {
 function setLanguage(id, loadSample) {
   const found = LANGUAGES.find(l => l.id===id); if (!found) return;
   currentLang = found;
+  if(typeof gtag==='function') gtag('event','language_change',{language:found.name});
   $('langIcon').textContent = found.icon; $('langName').textContent = found.name; $('langBadge').textContent = found.icon;
   if (loadSample) { codeInput.value = found.sample; $('fileName').value = found.ext; }
   else { const cur = $('fileName').value; if (cur.includes('.')) { const base = cur.substring(0, cur.lastIndexOf('.')) || 'main'; $('fileName').value = base + '.' + found.ext.split('.').pop(); } }
@@ -391,7 +392,7 @@ $('lineHeight').addEventListener('input', e=>{ settings.lineHeight=parseInt(e.ta
 $('splitLines').addEventListener('input', e=>{ settings.splitPer=parseInt(e.target.value,10)||35; updateCode(); });
 ['optDots','optLines','optTitle','optWater','optWrap'].forEach(id=>$(id).addEventListener('change', ()=>{ updateCode(); }));
 document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderThemes(b.dataset.filter); });
-document.querySelectorAll('#scaleSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#scaleSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.quality=b.dataset.quality || 'fhd'; updateQualityHint(); setLoading(false); });
+document.querySelectorAll('#scaleSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#scaleSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.quality=b.dataset.quality || 'fhd'; updateQualityHint(); setLoading(false); if(typeof gtag==='function') gtag('event','quality_change',{quality:b.dataset.quality}); });
 document.querySelectorAll('#fontSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#fontSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.font=b.dataset.font; updateCode(); });
 document.querySelectorAll('#shadowSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#shadowSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.shadow=b.dataset.shadow; applyTheme(); });
 $('langBtn').onclick=(e)=>{ e.stopPropagation(); $('langMenu').classList.toggle('open'); };
@@ -437,6 +438,7 @@ async function doExport(transparent){
     const a=document.createElement('a');
     a.download=`codesnap-${target.file}-${transparent?'png':'img'}-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
     a.href=canvas.toDataURL('image/png'); a.click();
+    if(typeof gtag==='function') gtag('event','download',{mode:transparent?'png':'image',quality:qkey,language:currentLang.id,theme:currentTheme.name,lines:lines});
     const modeLabel = transparent ? 'transparent card' : 'full image';
     if(saved.autoWrapped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • ${modeLabel} • auto-wrapped`);
     else if(info.capped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • ${modeLabel} • capped for stability`);
