@@ -133,34 +133,101 @@ pre code { line-height: 1.6; background: transparent !important; white-space: pr
 .mobile-hint { display: none; }
 
 @media (max-width: 980px) {
-  /* MOBILE APP-LIKE: preview fixed on top, controls swipe horizontally below.
-     No vertical page scroll — same logic as desktop (left scrolls, right fixed),
-     but stacked: top fixed, bottom horizontal swipe. */
-  body { height: 100dvh; overflow: hidden; display: flex; flex-direction: column; padding-bottom: 0; }
-  .topbar { height: 56px; padding: 0 14px; flex-shrink: 0; }
-  .tagline { display: none; }
-  .layout { display: flex; flex-direction: column; height: calc(100dvh - 56px - 64px); max-height: calc(100dvh - 56px - 64px); overflow: hidden; padding: 10px 10px 8px; gap: 8px; }
-  /* 1. Preview on TOP, always visible */
-  .preview { order: -1; flex-shrink: 0; height: auto; max-height: 46%; overflow-y: auto; overflow-x: hidden; padding: 0 2px 2px 0; }
+  /* ═══ MOBILE APP ═══ fixed preview top · scrollable controls bottom · no tab bar ═══ */
+  body { height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+  .topbar { height: 52px; padding: 0 14px; flex-shrink: 0; gap: 10px; }
+  .topbar .logo { font-size: 18px; }
+  .topbar .tagline { display: none; }
+  .topbar .pill { display: none; }
+  .topbar .install-btn { font-size: 12px; padding: 7px 14px; }
+
+  .layout {
+    display: flex; flex-direction: column;
+    height: calc(100dvh - 52px); max-height: calc(100dvh - 52px);
+    padding: 0; gap: 0; overflow: hidden;
+  }
+
+  /* ── PREVIEW: fixed on top, always visible, live updating ── */
+  .preview {
+    order: -1; flex-shrink: 0;
+    height: auto; max-height: 42%; min-height: 180px;
+    overflow-y: auto; overflow-x: hidden;
+    padding: 8px 10px 6px;
+    border-bottom: 1px solid #1f2430;
+    background: #0d1119;
+  }
   .preview-sticky { position: static; }
-  .export-card { margin-bottom: 0; padding: 12px; }
-  .snap-bg { padding: 16px; min-height: 160px; }
+  .export-card { margin-bottom: 0; padding: 10px; border-radius: 14px; }
+  .status-row { gap: 6px; margin-bottom: 2px; }
+  .status-pill { font-size: 11px; padding: 4px 10px; }
+  .snap-bg { padding: 14px; min-height: 140px; border-radius: 14px; margin-top: 6px; }
   .snap-card { max-width: 100%; }
-  .code-wrap { max-height: 170px; }
-  pre { max-height: 150px; }
-  /* swipe hint between preview and controls */
-  .mobile-hint { order: 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11.5px; font-weight: 700; color: #9aa3b2; flex-shrink: 0; padding: 1px 0; user-select: none; }
-  .mobile-hint .dots3 { letter-spacing: 3px; color: #a855f7; }
-  /* 2. Controls HORIZONTAL swipe strip at bottom */
-  .controls { order: 1; flex: 1; min-height: 0; height: auto; display: flex; flex-direction: row; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding: 2px 2px 8px; scrollbar-width: none; }
-  .controls::-webkit-scrollbar { display: none; }
-  .controls .card { min-width: 86vw; max-width: 86vw; flex-shrink: 0; scroll-snap-align: center; scroll-snap-stop: always; margin-bottom: 0; overflow-y: auto; overflow-x: hidden; max-height: 100%; -webkit-overflow-scrolling: touch; }
-  .theme-grid { grid-template-columns: 1fr 1fr 1fr; max-height: 40vh; }
-  textarea { min-height: 110px; }
-  .export-actions { flex-direction: row; } .btn { min-height: 48px; font-size: 15px; }
-  .sliders2 { grid-template-columns: 1fr 1fr; }
-  .tabbar { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 150; background: rgba(13,17,25,.96); backdrop-filter: blur(12px); border-top: 1px solid #1f2430; padding: 8px 4px calc(8px + env(safe-area-inset-bottom)); }
-  .tabbar a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; color: #9aa3b2; text-decoration: none; font-size: 18px; padding: 6px; border-radius: 10px; }
-  .tabbar a span { font-size: 10px; font-weight: 700; } .tabbar a.active { color: #c4b5fd; }
+  .code-wrap { max-height: 150px; padding: 12px 8px 14px 0; }
+  pre { max-height: 130px; }
+  .linenums { font-size: 13px; min-width: 32px; padding: 0 8px 0 12px; }
+  .titlebar { padding: 8px 12px; font-size: 12px; }
+  .titlebar .dots span { width: 10px; height: 10px; }
+  .titlebar .filelabel { font-size: 12px; }
+  .watermark { font-size: 10px; padding: 0 10px 8px 0; }
+  .quality-section { margin-bottom: 8px; }
+  .quality-section label { font-size: 11px; margin-bottom: 4px; }
+  .quality-seg button { padding: 6px 3px; font-size: 11px; }
+  .quality-seg button span { font-size: 9.5px; }
+  .export-actions { gap: 8px; margin-top: 8px; }
+  .export-actions .btn { padding: 11px 8px; font-size: 13px; border-radius: 12px; }
+  .export-actions .muted { font-size: 10.5px; margin-top: 4px; }
+
+  /* ── CONTROLS: vertical scroll below preview ── */
+  .controls {
+    order: 1; flex: 1; min-height: 0;
+    display: flex; flex-direction: column;
+    overflow-y: auto; overflow-x: hidden;
+    padding: 8px 10px 20px;
+    gap: 12px;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  .controls .card {
+    margin-bottom: 0; flex-shrink: 0;
+    padding: 14px; border-radius: 14px;
+  }
+  .controls .card .step { font-size: 14px; margin-bottom: 8px; }
+  textarea { min-height: 100px; font-size: 13px; }
+  .lang-btn { padding: 9px 10px; font-size: 13px; }
+  .lang-menu { max-height: 220px; }
+
+  /* theme grid: 3 columns, compact */
+  .theme-grid { grid-template-columns: 1fr 1fr 1fr; gap: 8px; max-height: none; }
+  .theme { padding: 6px; border-radius: 12px; }
+  .theme .swatch { height: 40px; border-radius: 8px; margin-bottom: 4px; }
+  .theme .tname { font-size: 11px; }
+  .theme .tdesc { font-size: 9.5px; }
+
+  /* sliders & toggles */
+  .sliders2 { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .toggle { padding: 8px 0; font-size: 12.5px; }
+  .seg button { padding: 8px 5px; font-size: 11.5px; }
+
+  /* advanced */
+  .adv { border-radius: 12px; }
+  .adv summary { padding: 10px 12px; font-size: 13px; }
+  .btn.full { padding: 10px; font-size: 13px; }
+
+  /* mobile hints */
+  .mobile-hint { display: none; }
+  .tabbar { display: none; }
+
+  /* install banner */
+  .install-banner { bottom: calc(12px + env(safe-area-inset-bottom)); }
 }
-@media (max-width: 480px) { .theme-grid { grid-template-columns: 1fr 1fr; } .sliders2 { grid-template-columns: 1fr; } .export-actions { flex-direction: row; } .controls .card { min-width: 88vw; max-width: 88vw; } .preview { max-height: 44%; } }
+@media (max-width: 480px) {
+  .theme-grid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .sliders2 { grid-template-columns: 1fr; }
+  .quality-seg { flex-wrap: wrap; }
+  .quality-seg button { min-width: calc(50% - 4px); }
+  .export-actions { flex-wrap: wrap; }
+  .export-actions .btn { min-width: calc(50% - 4px); }
+  .snap-bg { padding: 10px; min-height: 120px; }
+  .code-wrap { max-height: 120px; }
+  pre { max-height: 100px; }
+}
