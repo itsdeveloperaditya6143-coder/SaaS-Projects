@@ -65,7 +65,7 @@ const LANGUAGES = [
 
 let currentTheme = THEMES[0];
 let currentLang = LANGUAGES[0];
-const settings = { font:"'JetBrains Mono',monospace", fontSize:15, padding:48, radius:14, lineHeight:1.6, shadow:'deep', quality:'fhd', splitPer:35, transparent:false };
+const settings = { font:"'JetBrains Mono',monospace", fontSize:15, padding:48, radius:14, lineHeight:1.6, shadow:'deep', quality:'fhd', splitPer:35 };
 
 // HD / Full HD / 4K / 8K = PNG width-targeted export. 8K = max sharpness, zero blur on zoom.
 const QUALITY_TARGETS = {
@@ -110,7 +110,7 @@ function setLanguage(id, loadSample) {
   renderLangMenu(); scheduleUpdate();
 }
 function applyTheme() {
-  snapBg.style.background = settings.transparent ? 'transparent' : currentTheme.bg;
+  snapBg.style.background = currentTheme.bg;
   snapCard.style.background = currentTheme.card; snapCard.style.color = currentTheme.color;
   snapCard.style.borderRadius = settings.radius + 'px';
   snapCard.className = 'snap-card shadow-' + settings.shadow;
@@ -242,7 +242,10 @@ function computePngScale(el, targetW){
   return { scale, capped, cssW: w, cssH: h, outW: Math.round(w * scale), outH: Math.round(h * scale) };
 }
 async function renderPng(snapEl, scale){
-  const canvas = await html2canvas(snapEl, { scale, backgroundColor: settings.transparent ? null : undefined, useCORS: true, logging: false });
+  // backgroundColor:null is the white-corners fix: canvas itself stays transparent
+  // so the rounded 18px corners never get a white matte. Image mode paints the
+  // theme gradient via the element itself; PNG mode paints nothing outside the card.
+  const canvas = await html2canvas(snapEl, { scale, backgroundColor: null, useCORS: true, logging: false });
   return canvas;
 }
 function expandForExport(){
@@ -271,12 +274,16 @@ function restoreAfterExport(saved){
   if(saved.autoWrapped){ codeOut.style.whiteSpace=saved.ws||'pre'; codeOut.style.wordBreak=saved.wb||'normal'; }
   document.body.classList.remove('exporting'); syncScroll();
 }
-function setLoading(on, label){
-  const btn=$('downloadBtn'), split=$('splitBtn');
-  if(btn) btn.disabled=on;
-  if(split) split.disabled=on;
-  const lbl=$('dlLabel');
-  if(lbl) lbl.textContent = on ? label : '⬇ Download PNG';
+function setLoading(on, label, btnId){
+  const ids = ['downloadBtn', 'pngBtn', 'splitBtn'];
+  ids.forEach(id => { const b = $(id); if (b) b.disabled = on; });
+  if (on && label && btnId) {
+    const lbl = btnId === 'pngBtn' ? $('pngLabel') : btnId === 'downloadBtn' ? $('dlLabel') : null;
+    if (lbl) lbl.textContent = label;
+  } else if (!on) {
+    if ($('dlLabel')) $('dlLabel').textContent = '🖼️ Image';
+    if ($('pngLabel')) $('pngLabel').textContent = '✨ PNG';
+  }
 }
 
 // events
@@ -293,7 +300,7 @@ codeInput.addEventListener('input', scheduleUpdate);
 });
 $('lineHeight').addEventListener('input', e=>{ settings.lineHeight=parseInt(e.target.value,10)/10; updateCode(); });
 $('splitLines').addEventListener('input', e=>{ settings.splitPer=parseInt(e.target.value,10)||35; updateCode(); });
-['optDots','optLines','optTitle','optWater','optWrap','optTransparent'].forEach(id=>$(id).addEventListener('change', ()=>{ if(id==='optTransparent') applyTheme(); else updateCode(); }));
+['optDots','optLines','optTitle','optWater','optWrap'].forEach(id=>$(id).addEventListener('change', ()=>{ updateCode(); }));
 document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderThemes(b.dataset.filter); });
 document.querySelectorAll('#scaleSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#scaleSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.quality=b.dataset.quality || 'fhd'; updateQualityHint(); setLoading(false); });
 document.querySelectorAll('#fontSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#fontSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.font=b.dataset.font; updateCode(); });
@@ -306,28 +313,32 @@ $('splitHint').onclick=()=>{ $('exportAdv').open=true; $('splitBtn').scrollIntoV
 $('widthHint').onclick=()=>{ fitWidthToImage(); };
 $('copyBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText(codeInput.value); toast('✅ Copied!'); }catch{ toast('Copy failed'); } };
 
-$('downloadBtn').onclick=async()=>{
-  if ($('downloadBtn').disabled) return;
+// --- shared export core (background fix: backgroundColor:null removes the white matte around corners) ---
+async function doExport(transparent){
   const lines=codeInput.value.split('\n').length;
   if(lines>250){ toast('Too tall (>250 lines) — splitting is safer'); $('exportAdv').open=true; return; }
   const qkey=settings.quality || 'fhd';
   const target=QUALITY_TARGETS[qkey] || QUALITY_TARGETS.fhd;
   if(qkey==='8k' && lines>120){ toast('8K + long code may be heavy — Split is safer'); }
-  setLoading(true, qkey==='8k' ? '⏳ Rendering 8K (takes a few sec)...' : '⏳ Rendering...');
+  const tag = transparent ? 'png' : 'image';
+  setLoading(true, qkey==='8k' ? '⏳ Rendering 8K (takes a few sec)...' : '⏳ Rendering...', tag);
   const saved=expandForExport(); await sleep(180);
   try{
     const info=computePngScale(snapBg, target.width);
     let canvas=null;
     try {
-      canvas=await renderPng(snapBg, info.scale);
+      // transparent: render card only (no bg, no shadow, transparent outside) → logo on any platform
+      // image: full snapBg (gradient bg + card) → polished look, no white corners
+      const renderEl = transparent ? snapCard : snapBg;
+      canvas=await renderPng(renderEl, info.scale);
     } catch(e8k) {
-      // 8K OOM fallback: automatically retry at 4K so user never gets a glitch/blank
       console.warn('High-res render failed, falling back:', e8k);
       if(qkey==='8k'){
         const fb=computePngScale(snapBg, QUALITY_TARGETS['4k'].width);
-        canvas=await renderPng(snapBg, fb.scale);
+        const renderEl = transparent ? snapCard : snapBg;
+        canvas=await renderPng(renderEl, fb.scale);
         const a=document.createElement('a');
-        a.download=`codesnap-4k-fallback-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
+        a.download=`codesnap-4k-fallback-${transparent?'png':'img'}-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
         a.href=canvas.toDataURL('image/png'); a.click();
         toast(`⚠️ 8K ran out of memory — gave you 4K ${fb.outW}×${fb.outH} instead • try Split for long code`);
         restoreAfterExport(saved); setLoading(false); return;
@@ -335,14 +346,18 @@ $('downloadBtn').onclick=async()=>{
       throw e8k;
     }
     const a=document.createElement('a');
-    a.download=`codesnap-${target.file}-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
+    a.download=`codesnap-${target.file}-${transparent?'png':'img'}-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
     a.href=canvas.toDataURL('image/png'); a.click();
-    if(saved.autoWrapped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • auto-wrapped, nothing cut`);
-    else if(info.capped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • capped for stability, still crisp`);
-    else toast(`✅ ${target.label} • ${info.outW}×${info.outH} • crisp`);
+    const modeLabel = transparent ? 'transparent card' : 'full image';
+    if(saved.autoWrapped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • ${modeLabel} • auto-wrapped`);
+    else if(info.capped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • ${modeLabel} • capped for stability`);
+    else toast(`✅ ${target.label} • ${info.outW}×${info.outH} • ${modeLabel} • crisp`);
   }catch(e){ console.error(e); toast('Export failed — try Full HD or Split'); }
   restoreAfterExport(saved); setLoading(false);
-};
+}
+
+$('downloadBtn').onclick = () => doExport(false);  // Image = full card + gradient bg, no white corners
+$('pngBtn').onclick     = () => doExport(true);    // PNG   = card only, transparent outside
 $('splitBtn').onclick=async()=>{
   if ($('splitBtn').disabled) return;
   const allLines=codeInput.value.split('\n'), per=settings.splitPer, total=Math.ceil(allLines.length/per);

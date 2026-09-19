@@ -131,9 +131,11 @@ hello()</textarea>
       <button id="widthHint" class="split-hint width-hint" style="display:none">↔️ <span id="widthText">Line too wide — will be cut</span> <b>• Tap to Fit →</b></button>
 
       <div class="export-actions">
-        <button id="downloadBtn" class="btn primary big"><span id="dlLabel">⬇ Download PNG</span></button>
+        <button id="downloadBtn" class="btn primary"><span id="dlLabel">🖼️ Image</span></button>
+        <button id="pngBtn" class="btn ghost"><span id="pngLabel">✨ PNG</span></button>
         <button id="copyBtn" class="btn ghost">Copy</button>
       </div>
+      <div class="muted small" style="margin-top:6px; text-align:center">Image = with background • PNG = transparent card only, no background</div>
 
       <details id="exportAdv" class="adv">
         <summary><span>⚙️ Advanced export</span><span class="chev">▾</span></summary>
@@ -149,7 +151,6 @@ hello()</textarea>
             <div class="muted small" id="qualityHint" style="margin-top:6px">Full HD • 1920px wide • best for X/LinkedIn</div>
           </div>
           <div><label>Split: lines per image <b id="splitVal">35</b></label><input type="range" id="splitLines" min="15" max="60" value="35"></div>
-          <label class="toggle"><span>Transparent background (no gradient)</span><input type="checkbox" id="optTransparent"><i></i></label>
           <button id="splitBtn" class="btn ghost full">✂️ Split & download parts</button>
           <div class="muted small" style="margin-top:8px">Tip: under 50 lines = 1 perfect image. Over 80 = split works best for X.</div>
         </div>

@@ -106,12 +106,12 @@ pre code { line-height: 1.6; background: transparent !important; white-space: pr
 .split-hint.width-hint:hover { background: rgba(251,191,36,.18); }
 
 .export-actions { display: flex; gap: 10px; margin-top: 12px; }
-.btn { flex: 1; padding: 14px; border-radius: 14px; border: 1px solid #2a3142; background: #1a2030; color: #fff; font-weight: 800; cursor: pointer; font-size: 14px; transition: .15s; }
-.btn.big { flex: 2.2; font-size: 15px; }
+.btn { flex: 1; padding: 14px; border-radius: 14px; border: 1px solid #2a3142; background: #1a2030; color: #fff; font-weight: 800; cursor: pointer; font-size: 14px; transition: .15s; min-width: 0; }
 .btn.primary { background: linear-gradient(135deg,#8b5cf6,#ec4899); border: none; box-shadow: 0 8px 26px rgba(168,85,247,.4); }
 .btn.primary:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(168,85,247,.5); filter: brightness(1.05); }
 .btn.primary:disabled { opacity: .6; transform: none; cursor: wait; }
 .btn.ghost { background: #1a2132; } .btn.ghost:hover { border-color: #a855f7; }
+.btn.ghost:disabled { opacity: .6; cursor: wait; }
 .btn.full { width: 100%; margin-top: 10px; }
 .btn:active { transform: scale(.98); }
 .toast { margin-top: 10px; font-size: 13px; color: #4ade80; min-height: 18px; text-align: center; font-weight: 600; }
