@@ -359,12 +359,10 @@ function setLoading(on, label, btnId){
 // events
 codeInput.addEventListener('input', scheduleUpdate);
 ['fileName','waterText'].forEach(id=>$(id).addEventListener('input', scheduleUpdate));
-[['fontSize','fontSize'],['padding','padding'],['radius','radius']].forEach(([id])=>{
+[['fontSize','fontSize'],['padding','padding'],['radius','radius']].forEach(([id,key])=>{
   $(id).addEventListener('input', e=>{
     const v=parseInt(e.target.value,10);
-    if(id==='fontSize') settings.fontSize=v;
-    if(id==='padding') settings.padding=v;
-    if(id==='radius') settings.radius=v;
+    settings[key]=v;
     applyTheme();
   });
 });
