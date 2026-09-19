@@ -302,9 +302,11 @@ function toast(msg){ const t=$('toast'); t.textContent=msg; clearTimeout(t._h); 
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 function updateQualityHint(){
   const q = QUALITY_TARGETS[settings.quality] || QUALITY_TARGETS.fhd;
+  const txt = `${q.label} • ${q.width}px wide • ${q.desc}`;
   const el = $('qualityHint');
-  if (!el) return;
-  el.textContent = `${q.label} • ${q.width}px wide • ${q.desc}`;
+  if (el) el.textContent = txt;
+  const m = $('qualityHintMobile');
+  if (m) m.textContent = txt;
 }
 function computePngScale(el, targetW){
   const w = el.offsetWidth || 800;
@@ -402,6 +404,22 @@ $('preOut').addEventListener('scroll', syncScroll);
 $('splitHint').onclick=()=>{ $('exportAdv').open=true; $('splitBtn').scrollIntoView({behavior:'smooth', block:'center'}); };
 $('widthHint').onclick=()=>{ fitWidthToImage(); };
 $('copyBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText(codeInput.value); toast('✅ Copied!'); }catch{ toast('Copy failed'); } };
+
+// mobile export wiring (duplicated controls in scrollable area)
+document.querySelectorAll('.mexport .quality-seg button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.mexport .quality-seg button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  settings.quality=b.dataset.quality || 'fhd';
+  // sync desktop selector too
+  document.querySelectorAll('#scaleSeg button').forEach(x=>{ x.classList.toggle('active', x.dataset.quality===b.dataset.quality); });
+  updateQualityHint(); setLoading(false);
+  if(typeof gtag==='function') gtag('event','quality_change',{quality:b.dataset.quality});
+});
+document.querySelectorAll('.mexport .splitLines').forEach(el=>el.oninput=()=>{ settings.splitPer=+el.value; document.querySelectorAll('.splitVal').forEach(v=>v.textContent=el.value); });
+document.querySelectorAll('.mexport .splitBtn').forEach(el=>el.onclick=()=>{ if($('splitBtn')) $('splitBtn').click(); });
+document.querySelectorAll('.mexport .dl').forEach(el=>el.onclick=()=>doExport(false));
+document.querySelectorAll('.mexport .png').forEach(el=>el.onclick=()=>doExport(true));
+document.querySelectorAll('.mexport .copy').forEach(el=>el.onclick=async()=>{ try{ await navigator.clipboard.writeText(codeInput.value); toast('✅ Copied!'); }catch{ toast('Copy failed'); } });
 
 // --- shared export core (background fix: backgroundColor:null removes the white matte around corners) ---
 async function doExport(transparent){

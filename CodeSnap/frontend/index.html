@@ -115,14 +115,41 @@ hello()</textarea>
       <label class="toggle"><span>Title bar</span><input type="checkbox" id="optTitle" checked><i></i></label>
       <label class="toggle"><span>Watermark</span><input type="checkbox" id="optWater" checked><i></i></label>
       <label class="toggle"><span>Wrap long lines (recommended)</span><input type="checkbox" id="optWrap" checked><i></i></label>
+
+      <div class="mexport mobile-only">
+        <div class="mexport-actions">
+          <button class="btn primary dl"><span>🖼️ Image</span></button>
+          <button class="btn ghost png"><span>✨ PNG</span></button>
+          <button class="btn ghost copy">Copy</button>
+        </div>
+        <div class="muted small" style="margin-top:6px;text-align:center">Image = with background • PNG = transparent card only</div>
+        <div class="quality-section">
+          <label>Quality (crisp on every screen)</label>
+          <div class="seg quality-seg">
+            <button type="button" data-quality="hd">HD<span>720p</span></button>
+            <button type="button" data-quality="fhd" class="active">Full HD<span>1080p ✨</span></button>
+            <button type="button" data-quality="4k">4K<span>2160p</span></button>
+            <button type="button" data-quality="8k">8K<span>4320p 🔥</span></button>
+          </div>
+          <div class="muted small" id="qualityHintMobile" style="margin-top:6px">Full HD • 1920px wide • best for X/LinkedIn</div>
+        </div>
+        <details class="adv">
+          <summary><span>⚙️ Advanced export</span><span class="chev">▾</span></summary>
+          <div class="adv-body">
+            <div><label>Split: lines per image <b class="splitVal">35</b></label><input type="range" class="splitLines" min="15" max="60" value="35"></div>
+            <button class="btn ghost full splitBtn">✂️ Split & download parts</button>
+            <div class="muted small" style="margin-top:8px">Tip: under 50 lines = 1 perfect image. Over 80 = split works best for X.</div>
+          </div>
+        </details>
+      </div>
     </div>
   </section>
 
   <section class="preview">
     <div class="preview-sticky">
     <div class="card export-card">
-      <div class="step"><span class="live-pulse"></span> Live preview & export</div>
-      <div class="status-row">
+      <div class="step mhide"><span class="live-pulse"></span> Live preview & export</div>
+      <div class="status-row mhide">
         <span id="statusPill" class="status-pill ok"><span class="dot"></span><span id="statusText">4 lines • Ready</span></span>
         <span class="muted small">Theme: <b id="themeName">Dracula</b> • <span id="hlStatus">python ✓</span></span>
       </div>
@@ -142,17 +169,17 @@ hello()</textarea>
         </div>
       </div>
 
-      <button id="splitHint" class="split-hint" style="display:none">🧵 Long code? Split into <b id="splitCount">2</b> images for thread →</button>
-      <button id="widthHint" class="split-hint width-hint" style="display:none">↔️ <span id="widthText">Line too wide — will be cut</span> <b>• Tap to Fit →</b></button>
+      <button id="splitHint" class="split-hint mhide" style="display:none">🧵 Long code? Split into <b id="splitCount">2</b> images for thread →</button>
+      <button id="widthHint" class="split-hint width-hint mhide" style="display:none">↔️ <span id="widthText">Line too wide — will be cut</span> <b>• Tap to Fit →</b></button>
 
-      <div class="export-actions">
+      <div class="export-actions mhide">
         <button id="downloadBtn" class="btn primary"><span id="dlLabel">🖼️ Image</span></button>
         <button id="pngBtn" class="btn ghost"><span id="pngLabel">✨ PNG</span></button>
         <button id="copyBtn" class="btn ghost">Copy</button>
       </div>
-      <div class="muted small" style="margin-top:6px; text-align:center">Image = with background • PNG = transparent card only, no background</div>
+      <div class="muted small mhide" style="margin-top:6px; text-align:center">Image = with background • PNG = transparent card only, no background</div>
 
-      <div class="quality-section">
+      <div class="quality-section mhide">
         <label>Quality (crisp on every screen)</label>
         <div class="seg quality-seg" id="scaleSeg">
           <button type="button" data-quality="hd">HD<span>720p</span></button>
@@ -163,7 +190,7 @@ hello()</textarea>
         <div class="muted small" id="qualityHint" style="margin-top:6px">Full HD • 1920px wide • best for X/LinkedIn</div>
       </div>
 
-      <details id="exportAdv" class="adv">
+      <details id="exportAdv" class="adv mhide">
         <summary><span>⚙️ Advanced export</span><span class="chev">▾</span></summary>
         <div class="adv-body">
           <div><label>Split: lines per image <b id="splitVal">35</b></label><input type="range" id="splitLines" min="15" max="60" value="35"></div>
@@ -174,7 +201,7 @@ hello()</textarea>
 
       <div id="toast" class="toast"></div>
     </div>
-    <div class="footer">Built with Python + HTML/CSS/JS • Free • No login • #buildinpublic Week 2</div>
+    <div class="footer mhide">Built with Python + HTML/CSS/JS • Free • No login • #buildinpublic Week 2</div>
     </div>
   </section>
 </main>
