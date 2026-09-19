@@ -47,9 +47,9 @@ details[open] summary .chev { transform: rotate(180deg); }
 .lang-option .tick { margin-left: auto; color: #4ade80; font-weight: 800; } .lang-option small { color: #9aa3b2; }
 
 .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
-.filter { font-size: 12px; padding: 7px 12px; border-radius: 20px; background: #0b0e14; color: #9aa3b2; border: 1px solid #2a3142; cursor: pointer; width: auto; font-weight: 600; }
+.filter { font-size: 11.5px; padding: 6px 11px; border-radius: 20px; background: #0b0e14; color: #9aa3b2; border: 1px solid #2a3142; cursor: pointer; width: auto; font-weight: 600; white-space: nowrap; }
 .filter.active { background: #a855f7; color: #fff; border-color: #a855f7; box-shadow: 0 4px 14px rgba(168,85,247,.35); }
-.theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-height: 300px; overflow-y: auto; padding: 2px 6px 2px 2px; }
+.theme-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; max-height: 50vh; overflow-y: auto; padding: 2px 6px 2px 2px; }
 .theme { cursor: pointer; border-radius: 14px; padding: 8px; background: #0b0e14; border: 2px solid transparent; text-align: center; transition: .15s; }
 .theme:hover { transform: translateY(-1px); border-color: #2a3142; } .theme.active { border-color: #3b82f6; box-shadow: 0 4px 18px rgba(59,130,246,.3); }
 .theme .swatch { height: 48px; border-radius: 9px; margin-bottom: 6px; } .theme .tname { font-size: 12px; font-weight: 700; } .theme .tdesc { font-size: 10.5px; color: #9aa3b2; }
@@ -151,7 +151,7 @@ pre code { line-height: 1.6; background: transparent !important; white-space: pr
   .controls { order: 1; flex: 1; min-height: 0; height: auto; display: flex; flex-direction: row; gap: 12px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; padding: 2px 2px 8px; scrollbar-width: none; }
   .controls::-webkit-scrollbar { display: none; }
   .controls .card { min-width: 86vw; max-width: 86vw; flex-shrink: 0; scroll-snap-align: center; scroll-snap-stop: always; margin-bottom: 0; overflow-y: auto; overflow-x: hidden; max-height: 100%; -webkit-overflow-scrolling: touch; }
-  .theme-grid { grid-template-columns: 1fr 1fr 1fr; max-height: 30vh; }
+  .theme-grid { grid-template-columns: 1fr 1fr 1fr; max-height: 40vh; }
   textarea { min-height: 110px; }
   .export-actions { flex-direction: row; } .btn { min-height: 48px; font-size: 15px; }
   .sliders2 { grid-template-columns: 1fr 1fr; }

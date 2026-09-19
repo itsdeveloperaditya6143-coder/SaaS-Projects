@@ -9,42 +9,100 @@ fetch(`${BACKEND_URL}/api/health`)
   .catch(() => console.log('Backend sleeping/offline - continuing client-side only'));
 
 const THEMES = [
+  // ── DARK (16) ──
   { id:'dracula', name:'Dracula', desc:'dark • purple', cat:'dark', bg:'linear-gradient(135deg,#282a36,#44475a)', card:'#282a36', color:'#f8f8f2', title:'rgba(255,255,255,.06)', light:false },
   { id:'monokai', name:'Monokai', desc:'dark • classic', cat:'dark', bg:'linear-gradient(135deg,#272822,#3e3d32)', card:'#272822', color:'#f8f8f2', title:'rgba(255,255,255,.06)', light:false },
   { id:'nord', name:'Nord', desc:'dark • ice blue', cat:'dark', bg:'linear-gradient(135deg,#2e3440,#4c566a)', card:'#2e3440', color:'#eceff4', title:'rgba(255,255,255,.06)', light:false },
   { id:'onedark', name:'One Dark', desc:'dark • github', cat:'dark', bg:'linear-gradient(135deg,#0d1117,#21262d)', card:'#161b22', color:'#e6edf3', title:'rgba(255,255,255,.06)', light:false },
   { id:'tokyo', name:'Tokyo Night', desc:'dark • neon blue', cat:'dark', bg:'linear-gradient(135deg,#1a1b26,#414868)', card:'#1a1b26', color:'#c0caf5', title:'rgba(255,255,255,.06)', light:false },
   { id:'nightowl', name:'Night Owl', desc:'dark • deep blue', cat:'dark', bg:'linear-gradient(135deg,#011627,#0b2948)', card:'#011627', color:'#d6deeb', title:'rgba(255,255,255,.07)', light:false },
+  { id:'forest', name:'Forest', desc:'dark • green', cat:'dark', bg:'linear-gradient(135deg,#052e16,#15803d)', card:'#052e16', color:'#dcfce7', title:'rgba(255,255,255,.08)', light:false },
+  { id:'charcoal', name:'Charcoal', desc:'minimal • gray', cat:'dark', bg:'#18181b', card:'#27272a', color:'#f4f4f5', title:'rgba(255,255,255,.06)', light:false },
+  { id:'midnight', name:'Midnight', desc:'black-blue • sky', cat:'dark', bg:'linear-gradient(135deg,#020617,#1e3a8a)', card:'#020617', color:'#e2e8f0', title:'rgba(255,255,255,.07)', light:false },
+  { id:'matrix', name:'Matrix', desc:'dark • hacker green', cat:'dark', bg:'linear-gradient(135deg,#000000,#003300)', card:'#000d00', color:'#00ff41', title:'rgba(0,255,65,.1)', light:false },
+  { id:'rosepine', name:'Rosé Pine', desc:'dark • muted rose', cat:'dark', bg:'linear-gradient(135deg,#191724,#403d52)', card:'#191724', color:'#e0def4', title:'rgba(255,255,255,.07)', light:false },
+  { id:'catppu', name:'Catppuccin', desc:'dark • pastel', cat:'dark', bg:'linear-gradient(135deg,#11111b,#45475a)', card:'#1e1e2e', color:'#cdd6f4', title:'rgba(255,255,255,.07)', light:false },
+  { id:'coffee', name:'Coffee', desc:'dark • warm brown', cat:'dark', bg:'linear-gradient(135deg,#211512,#795548)', card:'#211512', color:'#efebe9', title:'rgba(255,255,255,.07)', light:false },
+  { id:'ember', name:'Ember', desc:'dark • fire orange', cat:'dark', bg:'linear-gradient(135deg,#1c0a00,#c2410c)', card:'#1c0a00', color:'#fed7aa', title:'rgba(255,255,255,.07)', light:false },
+  { id:'iceberg', name:'Iceberg', desc:'dark • pale blue', cat:'dark', bg:'linear-gradient(135deg,#0b1220,#334155)', card:'#0f172a', color:'#e0f2fe', title:'rgba(255,255,255,.07)', light:false },
+  { id:'crimson', name:'Crimson Night', desc:'dark • deep red', cat:'dark', bg:'linear-gradient(135deg,#160404,#7f1d1d)', card:'#160404', color:'#fee2e2', title:'rgba(255,255,255,.07)', light:false },
+
+  // ── LIGHT (6) ──
+  { id:'light', name:'GitHub Light', desc:'light • clean', cat:'light', bg:'linear-gradient(135deg,#f6f8fa,#d0d7de)', card:'#ffffff', color:'#24292f', title:'rgba(0,0,0,.05)', light:true },
+  { id:'solar', name:'Solarized', desc:'light • cream', cat:'light', bg:'linear-gradient(135deg,#fdf6e3,#eee8d5)', card:'#fdf6e3', color:'#586e75', title:'rgba(0,0,0,.05)', light:true },
+  { id:'snow', name:'Snow', desc:'light • pure white', cat:'light', bg:'linear-gradient(135deg,#ffffff,#cbd5e1)', card:'#ffffff', color:'#0f172a', title:'rgba(0,0,0,.05)', light:true },
+  { id:'mint', name:'Mint', desc:'light • fresh green', cat:'light', bg:'linear-gradient(135deg,#d1fae5,#6ee7b7)', card:'#f0fdf4', color:'#064e3b', title:'rgba(0,0,0,.05)', light:true },
+  { id:'peach', name:'Peach', desc:'light • warm', cat:'light', bg:'linear-gradient(135deg,#ffedd5,#fb923c)', card:'#fff7ed', color:'#7c2d12', title:'rgba(0,0,0,.05)', light:true },
+  { id:'lavender', name:'Lavender', desc:'light • soft purple', cat:'light', bg:'linear-gradient(135deg,#ede9fe,#a78bfa)', card:'#faf5ff', color:'#4c1d95', title:'rgba(0,0,0,.05)', light:true },
+
+  // ── GRADIENT (14) ──
   { id:'cobalt', name:'Cobalt', desc:'gradient • blue', cat:'gradient', bg:'linear-gradient(135deg,#0047ff,#00d4ff)', card:'#002884', color:'#ffffff', title:'rgba(255,255,255,.12)', light:false },
   { id:'sunset', name:'Sunset', desc:'gradient • orange', cat:'gradient', bg:'linear-gradient(135deg,#ff512f,#dd2476)', card:'#2b0a1a', color:'#ffe4e6', title:'rgba(255,255,255,.08)', light:false },
   { id:'aurora', name:'Aurora', desc:'gradient • teal purple', cat:'gradient', bg:'linear-gradient(135deg,#0f766e,#7c3aed)', card:'#1e1b4b', color:'#ffffff', title:'rgba(255,255,255,.1)', light:false },
   { id:'grape', name:'Grape', desc:'gradient • purple pink', cat:'gradient', bg:'linear-gradient(135deg,#7c3aed,#ec4899)', card:'#2e1065', color:'#fae8ff', title:'rgba(255,255,255,.1)', light:false },
   { id:'ocean', name:'Ocean', desc:'gradient • teal blue', cat:'gradient', bg:'linear-gradient(135deg,#0ea5e9,#22d3ee)', card:'#082f49', color:'#e0f2fe', title:'rgba(255,255,255,.1)', light:false },
-  { id:'forest', name:'Forest', desc:'dark • green', cat:'dark', bg:'linear-gradient(135deg,#052e16,#15803d)', card:'#052e16', color:'#dcfce7', title:'rgba(255,255,255,.08)', light:false },
-  { id:'charcoal', name:'Charcoal', desc:'minimal • gray', cat:'dark', bg:'#18181b', card:'#27272a', color:'#f4f4f5', title:'rgba(255,255,255,.06)', light:false },
-  { id:'midnight', name:'Midnight', desc:'black-blue • sky', cat:'dark', bg:'linear-gradient(135deg,#020617,#1e3a8a)', card:'#020617', color:'#e2e8f0', title:'rgba(255,255,255,.07)', light:false },
-  { id:'light', name:'GitHub Light', desc:'light • clean', cat:'light', bg:'linear-gradient(135deg,#f6f8fa,#d0d7de)', card:'#ffffff', color:'#24292f', title:'rgba(0,0,0,.05)', light:true },
-  { id:'solar', name:'Solarized', desc:'light • cream', cat:'light', bg:'linear-gradient(135deg,#fdf6e3,#eee8d5)', card:'#fdf6e3', color:'#586e75', title:'rgba(0,0,0,.05)', light:true },
   { id:'venom', name:'Venom', desc:'toxic • purple green', cat:'gradient', bg:'linear-gradient(135deg,#000000,#7c3aed)', card:'#0a0a0a', color:'#a3e635', title:'rgba(163,230,53,.12)', light:false },
   { id:'blood', name:'Bloodzone', desc:'black-red • intense', cat:'gradient', bg:'linear-gradient(135deg,#000000,#dc2626)', card:'#0c0a09', color:'#fecaca', title:'rgba(255,255,255,.07)', light:false },
-  { id:'cyber', name:'Cyberpunk', desc:'gradient • neon pink', cat:'gradient', bg:'linear-gradient(135deg,#ff0080,#7928ca,#00fff5)', card:'#0f0f1e', color:'#f0f0ff', title:'rgba(255,0,128,.14)', light:false },
-  { id:'matrix', name:'Matrix', desc:'dark • hacker green', cat:'dark', bg:'linear-gradient(135deg,#000000,#003300)', card:'#000d00', color:'#00ff41', title:'rgba(0,255,65,.1)', light:false },
-  { id:'rosepine', name:'Rosé Pine', desc:'dark • muted rose', cat:'dark', bg:'linear-gradient(135deg,#191724,#403d52)', card:'#191724', color:'#e0def4', title:'rgba(255,255,255,.07)', light:false },
-  { id:'catppu', name:'Catppuccin', desc:'dark • pastel', cat:'dark', bg:'linear-gradient(135deg,#11111b,#45475a)', card:'#1e1e2e', color:'#cdd6f4', title:'rgba(255,255,255,.07)', light:false },
-  { id:'synth', name:'Synthwave', desc:'gradient • retro 80s', cat:'gradient', bg:'linear-gradient(135deg,#ff71ce,#7311d6,#01cdfe)', card:'#1a0b2e', color:'#fff7e6', title:'rgba(255,113,206,.14)', light:false },
-  { id:'coffee', name:'Coffee', desc:'dark • warm brown', cat:'dark', bg:'linear-gradient(135deg,#211512,#795548)', card:'#211512', color:'#efebe9', title:'rgba(255,255,255,.07)', light:false },
-  { id:'ember', name:'Ember', desc:'dark • fire orange', cat:'dark', bg:'linear-gradient(135deg,#1c0a00,#c2410c)', card:'#1c0a00', color:'#fed7aa', title:'rgba(255,255,255,.07)', light:false },
-  { id:'iceberg', name:'Iceberg', desc:'dark • pale blue', cat:'dark', bg:'linear-gradient(135deg,#0b1220,#334155)', card:'#0f172a', color:'#e0f2fe', title:'rgba(255,255,255,.07)', light:false },
-  { id:'crimson', name:'Crimson Night', desc:'dark • deep red', cat:'dark', bg:'linear-gradient(135deg,#160404,#7f1d1d)', card:'#160404', color:'#fee2e2', title:'rgba(255,255,255,.07)', light:false },
-  { id:'snow', name:'Snow', desc:'light • pure white', cat:'light', bg:'linear-gradient(135deg,#ffffff,#cbd5e1)', card:'#ffffff', color:'#0f172a', title:'rgba(0,0,0,.05)', light:true },
-  { id:'mint', name:'Mint', desc:'light • fresh green', cat:'light', bg:'linear-gradient(135deg,#d1fae5,#6ee7b7)', card:'#f0fdf4', color:'#064e3b', title:'rgba(0,0,0,.05)', light:true },
-  { id:'peach', name:'Peach', desc:'light • warm', cat:'light', bg:'linear-gradient(135deg,#ffedd5,#fb923c)', card:'#fff7ed', color:'#7c2d12', title:'rgba(0,0,0,.05)', light:true },
-  { id:'lavender', name:'Lavender', desc:'light • soft purple', cat:'light', bg:'linear-gradient(135deg,#ede9fe,#a78bfa)', card:'#faf5ff', color:'#4c1d95', title:'rgba(0,0,0,.05)', light:true },
   { id:'candy', name:'Candy', desc:'gradient • pink pop', cat:'gradient', bg:'linear-gradient(135deg,#ff6fd8,#ffc3a0)', card:'#3b0a2a', color:'#fff0f6', title:'rgba(255,255,255,.12)', light:false },
   { id:'ultra', name:'Ultraviolet', desc:'gradient • deep space', cat:'gradient', bg:'linear-gradient(135deg,#41295a,#2f0743,#734b6d)', card:'#1a0b2e', color:'#e9d5ff', title:'rgba(255,255,255,.1)', light:false },
   { id:'sunrise', name:'Sunrise', desc:'gradient • morning', cat:'gradient', bg:'linear-gradient(135deg,#ff9966,#ff5e62)', card:'#2a0e0e', color:'#fff7ed', title:'rgba(255,255,255,.1)', light:false },
   { id:'emerald', name:'Emerald Glow', desc:'gradient • teal green', cat:'gradient', bg:'linear-gradient(135deg,#134e5e,#71b280)', card:'#022c22', color:'#d1fae5', title:'rgba(255,255,255,.1)', light:false },
   { id:'cotton', name:'Cotton Candy', desc:'gradient • soft dream', cat:'gradient', bg:'linear-gradient(135deg,#a18cd1,#fbc2eb)', card:'#241443', color:'#fdf4ff', title:'rgba(255,255,255,.12)', light:false },
+  { id:'synth', name:'Synthwave', desc:'gradient • retro 80s', cat:'gradient', bg:'linear-gradient(135deg,#ff71ce,#7311d6,#01cdfe)', card:'#1a0b2e', color:'#fff7e6', title:'rgba(255,113,206,.14)', light:false },
+  { id:'embergrad', name:'Fire Gradient', desc:'gradient • flame', cat:'gradient', bg:'linear-gradient(135deg,#f97316,#dc2626,#991b1b)', card:'#1c0505', color:'#fed7aa', title:'rgba(249,115,22,.12)', light:false },
+
+  // ── GAMING (5) ── NEW
+  { id:'rgb', name:'RGB Fury', desc:'gaming • rainbow', cat:'gaming', bg:'linear-gradient(135deg,#ff0000,#ff8800,#00ff00,#0088ff,#8800ff)', card:'#0a0a12', color:'#f0f0ff', title:'rgba(255,255,255,.08)', light:false },
+  { id:'razer', name:'Razer', desc:'gaming • neon green', cat:'gaming', bg:'linear-gradient(135deg,#000000,#0a1a0a,#003300)', card:'#0d0d0d', color:'#44d62c', title:'rgba(68,214,44,.1)', light:false },
+  { id:'ps5', name:'PlayStation', desc:'gaming • blue white', cat:'gaming', bg:'linear-gradient(135deg,#003087,#0070d1,#00aaff)', card:'#001845', color:'#e8f4ff', title:'rgba(0,170,255,.1)', light:false },
+  { id:'xbox', name:'Xbox', desc:'gaming • green dark', cat:'gaming', bg:'linear-gradient(135deg,#0e7a0d,#107c10,#0a4a0a)', card:'#0a0a0a', color:'#9dff00', title:'rgba(157,255,0,.08)', light:false },
+  { id:'esports', name:'Esports', desc:'gaming • neon purple', cat:'gaming', bg:'linear-gradient(135deg,#0d0221,#150734,#3b0764)', card:'#0d0221', color:'#ff2bd4', title:'rgba(255,43,212,.1)', light:false },
+
+  // ── CYBERPUNK (5) ── NEW
+  { id:'cp2077', name:'Cyberpunk 2077', desc:'cyber • yellow black', cat:'cyberpunk', bg:'linear-gradient(135deg,#0a0a0a,#1a1a0a,#2a2a00)', card:'#0c0c08', color:'#fcee09', title:'rgba(252,238,9,.1)', light:false },
+  { id:'bladerunner', name:'Blade Runner', desc:'cyber • orange teal', cat:'cyberpunk', bg:'linear-gradient(135deg,#0f0f0a,#1a2a2a,#ff6a00)', card:'#0a1010', color:'#00e5ff', title:'rgba(0,229,255,.1)', light:false },
+  { id:'neoncity', name:'Neon City', desc:'cyber • pink cyan', cat:'cyberpunk', bg:'linear-gradient(135deg,#0a0014,#1a0028,#ff00aa)', card:'#0a0014', color:'#00ffff', title:'rgba(0,255,255,.12)', light:false },
+  { id:'glitch', name:'Glitch', desc:'cyber • distorted', cat:'cyberpunk', bg:'linear-gradient(135deg,#000000,#110022,#001133)', card:'#050510', color:'#ff0044', title:'rgba(255,0,68,.12)', light:false },
+  { id:'chrome', name:'Chrome', desc:'cyber • metallic', cat:'cyberpunk', bg:'linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)', card:'#0a0a1a', color:'#e2e2e2', title:'rgba(200,200,220,.08)', light:false },
+
+  // ── RETRO (5) ── NEW
+  { id:'retrowave', name:'Retrowave', desc:'retro • 80s synth', cat:'retro', bg:'linear-gradient(135deg,#ff00ff,#0000ff,#ff00ff)', card:'#1a0030', color:'#ff69b4', title:'rgba(255,0,255,.1)', light:false },
+  { id:'terminal', name:'Old Terminal', desc:'retro • green CRT', cat:'retro', bg:'linear-gradient(135deg,#000a00,#001a00,#002200)', card:'#000a00', color:'#00ff00', title:'rgba(0,255,0,.08)', light:false },
+  { id:'amber', name:'Amber Monitor', desc:'retro • amber CRT', cat:'retro', bg:'linear-gradient(135deg,#0a0500,#1a0800,#2a0c00)', card:'#0a0500', color:'#ff8c00', title:'rgba(255,140,0,.08)', light:false },
+  { id:'retromac', name:'Retro Mac', desc:'retro • beige', cat:'retro', bg:'linear-gradient(135deg,#c4b69c,#a89880,#d4c5a9)', card:'#d4c5a9', color:'#1a1a1a', title:'rgba(0,0,0,.06)', light:true },
+  { id:'win95', name:'Windows 95', desc:'retro • teal', cat:'retro', bg:'linear-gradient(135deg,#008080,#006666,#009999)', card:'#c0c0c0', color:'#000000', title:'rgba(0,0,0,.08)', light:true },
+
+  // ── NATURE (5) ── NEW
+  { id:'deepforest', name:'Deep Forest', desc:'nature • dark green', cat:'nature', bg:'linear-gradient(135deg,#0b1a0b,#1a3a1a,#0a2a0a)', card:'#0b1a0b', color:'#90ee90', title:'rgba(144,238,144,.08)', light:false },
+  { id:'deepocean', name:'Deep Ocean', desc:'nature • abyss blue', cat:'nature', bg:'linear-gradient(135deg,#000428,#001845,#001d3d)', card:'#000428', color:'#4fc3f7', title:'rgba(79,195,247,.08)', light:false },
+  { id:'aurorasky', name:'Aurora Sky', desc:'nature • northern lights', cat:'nature', bg:'linear-gradient(135deg,#0a1628,#0d3b66,#00b4d8,#7b2cbf)', card:'#0a1628', color:'#c8b6ff', title:'rgba(200,182,255,.08)', light:false },
+  { id:'volcano', name:'Volcano', desc:'nature • lava red', cat:'nature', bg:'linear-gradient(135deg,#1a0000,#3d0000,#ff4500)', card:'#0d0000', color:'#ff6b35', title:'rgba(255,107,53,.1)', light:false },
+  { id:'desert', name:'Desert', desc:'nature • warm sand', cat:'nature', bg:'linear-gradient(135deg,#c2b280,#d4a574,#8b6914)', card:'#c2b280', color:'#3d2b1f', title:'rgba(61,43,31,.08)', light:true },
+
+  // ── KAWAII (5) ── NEW
+  { id:'sakura', name:'Sakura', desc:'kawaii • pink blossom', cat:'kawaii', bg:'linear-gradient(135deg,#ffb7c5,#ff69b4,#ffc0cb)', card:'#fff0f5', color:'#c71585', title:'rgba(199,21,133,.06)', light:true },
+  { id:'mintcandy', name:'Mint Candy', desc:'kawaii • fresh mint', cat:'kawaii', bg:'linear-gradient(135deg,#b2f5ea,#81e6d9,#4fd1c5)', card:'#e6fffa', color:'#234e52', title:'rgba(35,78,82,.06)', light:true },
+  { id:'lollipop', name:'Lollipop', desc:'kawaii • rainbow', cat:'kawaii', bg:'linear-gradient(135deg,#ff6b6b,#feca57,#48dbfb,#ff9ff3)', card:'#fff5f5', color:'#2d3436', title:'rgba(0,0,0,.04)', light:true },
+  { id:'jellyfish', name:'Jellyfish', desc:'kawaii • sea glow', cat:'kawaii', bg:'linear-gradient(135deg,#667eea,#764ba2,#f093fb)', card:'#1a1040', color:'#e0c3fc', title:'rgba(224,195,252,.1)', light:false },
+  { id:'pompurin', name:'Pompurin', desc:'kawaii • custard', cat:'kawaii', bg:'linear-gradient(135deg,#ffd966,#f6d365,#fda085)', card:'#fff8e1', color:'#5d4037', title:'rgba(93,64,55,.06)', light:true },
+
+  // ── NEON (4) ── NEW
+  { id:'neonpink', name:'Neon Pink', desc:'neon • hot pink', cat:'neon', bg:'linear-gradient(135deg,#0a0014,#1a0028)', card:'#0d001a', color:'#ff1493', title:'rgba(255,20,147,.12)', light:false },
+  { id:'neongreen', name:'Neon Green', desc:'neon • electric', cat:'neon', bg:'linear-gradient(135deg,#000a00,#001a00)', card:'#000d00', color:'#39ff14', title:'rgba(57,255,20,.1)', light:false },
+  { id:'neonblue', name:'Neon Blue', desc:'neon • electric blue', cat:'neon', bg:'linear-gradient(135deg,#000014,#000028)', card:'#00000d', color:'#00bfff', title:'rgba(0,191,255,.1)', light:false },
+  { id:'neonpurple', name:'Neon Purple', desc:'neon • violet glow', cat:'neon', bg:'linear-gradient(135deg,#0a001a,#140030)', card:'#0a0014', color:'#bf00ff', title:'rgba(191,0,255,.12)', light:false },
+
+  // ── MINIMAL (4) ── NEW
+  { id:'purewhite', name:'Pure White', desc:'minimal • clean', cat:'minimal', bg:'#ffffff', card:'#ffffff', color:'#111827', title:'rgba(0,0,0,.04)', light:true },
+  { id:'paper', name:'Paper', desc:'minimal • off-white', cat:'minimal', bg:'#fafafa', card:'#f5f5f5', color:'#1a1a1a', title:'rgba(0,0,0,.04)', light:true },
+  { id:'ink', name:'Ink', desc:'minimal • black', cat:'minimal', bg:'#000000', card:'#111111', color:'#f5f5f5', title:'rgba(255,255,255,.06)', light:false },
+  { id:'slate', name:'Slate', desc:'minimal • gray', cat:'minimal', bg:'#1e293b', card:'#334155', color:'#f1f5f9', title:'rgba(255,255,255,.06)', light:false },
+
+  // ── FILM (4) ── NEW
+  { id:'noir', name:'Noir', desc:'film • black white', cat:'film', bg:'linear-gradient(135deg,#0a0a0a,#1a1a1a,#2a2a2a)', card:'#0a0a0a', color:'#d4d4d4', title:'rgba(255,255,255,.06)', light:false },
+  { id:'technicolor', name:'Technicolor', desc:'film • vivid 70s', cat:'film', bg:'linear-gradient(135deg,#8b0000,#ff8c00,#006400)', card:'#1a0800', color:'#ffd700', title:'rgba(255,215,0,.1)', light:false },
+  { id:'vintage', name:'Vintage', desc:'film • sepia tone', cat:'film', bg:'linear-gradient(135deg,#d4a574,#c49a6c,#a0522d)', card:'#c49a6c', color:'#3e2723', title:'rgba(62,39,35,.08)', light:true },
+  { id:'hollywood', name:'Hollywood', desc:'film • golden hour', cat:'film', bg:'linear-gradient(135deg,#1a0a00,#3d1c00,#c68642)', card:'#1a0a00', color:'#ffd599', title:'rgba(255,213,153,.1)', light:false },
 ];
 const LANGUAGES = [
   { id:'python', name:'Python', icon:'🐍', hljs:'python', ext:'main.py', sample:'def hello():\n    print("Small steps every day compound 🚀")\n\nhello()' },
