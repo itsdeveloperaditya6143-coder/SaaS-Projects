@@ -139,13 +139,14 @@ hello()</textarea>
         <summary><span>⚙️ Advanced export</span><span class="chev">▾</span></summary>
         <div class="adv-body">
           <div class="adv-group">
-            <label>Quality (auto picks best to avoid crash)</label>
-            <div class="seg" id="scaleSeg">
-              <button type="button" data-scale="auto" class="active">Auto ✨</button>
-              <button type="button" data-scale="1">1x</button>
-              <button type="button" data-scale="2">2x</button>
-              <button type="button" data-scale="3">3x</button>
+            <label>Quality (crisp on every screen)</label>
+            <div class="seg quality-seg" id="scaleSeg">
+              <button type="button" data-quality="hd">HD<span>720p</span></button>
+              <button type="button" data-quality="fhd" class="active">Full HD<span>1080p ✨</span></button>
+              <button type="button" data-quality="4k">4K<span>2160p</span></button>
+              <button type="button" data-quality="svg">Original<span>SVG ♾️</span></button>
             </div>
+            <div class="muted small" id="qualityHint" style="margin-top:6px">Full HD • 1920px wide • best for X/LinkedIn</div>
           </div>
           <div><label>Split: lines per image <b id="splitVal">35</b></label><input type="range" id="splitLines" min="15" max="60" value="35"></div>
           <label class="toggle"><span>Transparent background (no gradient)</span><input type="checkbox" id="optTransparent"><i></i></label>

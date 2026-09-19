@@ -65,7 +65,15 @@ const LANGUAGES = [
 
 let currentTheme = THEMES[0];
 let currentLang = LANGUAGES[0];
-const settings = { font:"'JetBrains Mono',monospace", fontSize:15, padding:48, radius:14, lineHeight:1.6, shadow:'deep', scaleMode:'auto', splitPer:35, transparent:false };
+const settings = { font:"'JetBrains Mono',monospace", fontSize:15, padding:48, radius:14, lineHeight:1.6, shadow:'deep', quality:'fhd', splitPer:35, transparent:false };
+
+// HD / Full HD / 4K = PNG width-targeted export. Original SVG = true vector (infinite zoom, zero blur).
+const QUALITY_TARGETS = {
+  hd:  { width: 1280, label: 'HD',      file: 'hd',       desc: '1280px wide • small file • fast share' },
+  fhd: { width: 1920, label: 'Full HD', file: 'fhd',      desc: '1920px wide • best for X/LinkedIn' },
+  '4k':{ width: 3840, label: '4K Ultra',file: '4k',       desc: '3840px wide • max detail • larger file' },
+  svg: { vector: true, label: 'Original',file: 'original',desc: 'Vector SVG • infinite zoom • zero blur' },
+};
 
 const $ = (id) => document.getElementById(id);
 const codeInput = $('codeInput'), codeOut = $('codeOut');
@@ -202,11 +210,55 @@ function fitWidthToImage(){
 function syncScroll(){ const pre=$('preOut'); if(pre) $('lineNums').style.transform=`translateY(${-pre.scrollTop}px)`; }
 function toast(msg){ const t=$('toast'); t.textContent=msg; clearTimeout(t._h); t._h=setTimeout(()=>t.textContent='',3200); }
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
-function pickScale(lines){
-  if (settings.scaleMode !== 'auto') return parseInt(settings.scaleMode,10);
-  if (lines > 120) return 1;
-  if (lines > 70) return 1;
-  return 2;
+function updateQualityHint(){
+  const q = QUALITY_TARGETS[settings.quality] || QUALITY_TARGETS.fhd;
+  const el = $('qualityHint');
+  if (!el) return;
+  if (q.vector) el.textContent = 'Original SVG • vector • infinite zoom, zero blur • best for blogs/docs';
+  else el.textContent = `${q.label} • ${q.width}px wide • ${q.desc}`;
+}
+function computePngScale(el, targetW){
+  const w = el.offsetWidth || 800;
+  const h = el.offsetHeight || 400;
+  let scale = targetW / w;
+  // clamp: never worse than CSS (1), max 5 so true 4K width is reachable on typical cards
+  scale = Math.min(5, Math.max(1, scale));
+  // memory guard: cap total pixels ~24MP (mobile-safe, avoids crash/glitch)
+  const MAX_PIXELS = 24000000;
+  const est = (w * scale) * (h * scale);
+  let capped = false;
+  if (est > MAX_PIXELS) {
+    scale = Math.sqrt(MAX_PIXELS / (w * h));
+    capped = true;
+  }
+  // round to 2 decimals to avoid subpixel blur
+  scale = Math.max(1, Math.round(scale * 100) / 100);
+  return { scale, capped, cssW: w, cssH: h, outW: Math.round(w * scale), outH: Math.round(h * scale) };
+}
+async function exportOriginalSVG(suffix=''){
+  // True vector export via foreignObject: text stays sharp at any zoom (no blur).
+  // Assumes expandForExport() already called so full code is measurable.
+  const W = snapBg.offsetWidth;
+  const H = snapBg.offsetHeight;
+  const clone = snapBg.cloneNode(true);
+  // Inline computed styles so highlight.js colors survive (cross-origin CSS can't be read directly).
+  const srcEls = [snapBg, ...snapBg.querySelectorAll('*')];
+  const cloneEls = [clone, ...clone.querySelectorAll('*')];
+  srcEls.forEach((src, i) => {
+    try { cloneEls[i].setAttribute('style', getComputedStyle(src).cssText); } catch(e) {}
+  });
+  clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+  clone.style.width = W + 'px';
+  clone.style.height = H + 'px';
+  clone.style.margin = '0';
+  const svgText = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><foreignObject x="0" y="0" width="${W}" height="${H}">${new XMLSerializer().serializeToString(clone)}</foreignObject></svg>`;
+  const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+  const a = document.createElement('a');
+  a.download = `codesnap-original${suffix}.svg`;
+  a.href = URL.createObjectURL(blob);
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  return { W, H };
 }
 function expandForExport(){
   document.body.classList.add('exporting');
@@ -235,8 +287,16 @@ function restoreAfterExport(saved){
   document.body.classList.remove('exporting'); syncScroll();
 }
 function setLoading(on, label){
-  const btn=$('downloadBtn'); btn.disabled=on;
-  $('dlLabel').textContent = on ? label : '⬇ Download PNG';
+  const btn=$('downloadBtn'), split=$('splitBtn');
+  if(btn) btn.disabled=on;
+  if(split) split.disabled=on;
+  const lbl=$('dlLabel');
+  if(lbl) lbl.textContent = on ? label : (settings.quality==='svg' ? '⬇ Download SVG' : '⬇ Download PNG');
+  // keep button label in sync when idle
+  if(!on && lbl) {
+    const q = QUALITY_TARGETS[settings.quality];
+    lbl.textContent = (q && q.vector) ? '⬇ Download SVG' : '⬇ Download PNG';
+  }
 }
 
 // events
@@ -255,7 +315,7 @@ $('lineHeight').addEventListener('input', e=>{ settings.lineHeight=parseInt(e.ta
 $('splitLines').addEventListener('input', e=>{ settings.splitPer=parseInt(e.target.value,10)||35; updateCode(); });
 ['optDots','optLines','optTitle','optWater','optWrap','optTransparent'].forEach(id=>$(id).addEventListener('change', ()=>{ if(id==='optTransparent') applyTheme(); else updateCode(); }));
 document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderThemes(b.dataset.filter); });
-document.querySelectorAll('#scaleSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#scaleSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.scaleMode=b.dataset.scale; });
+document.querySelectorAll('#scaleSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#scaleSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.quality=b.dataset.quality || 'fhd'; updateQualityHint(); setLoading(false); });
 document.querySelectorAll('#fontSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#fontSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.font=b.dataset.font; updateCode(); });
 document.querySelectorAll('#shadowSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#shadowSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.shadow=b.dataset.shadow; applyTheme(); });
 $('langBtn').onclick=(e)=>{ e.stopPropagation(); $('langMenu').classList.toggle('open'); };
@@ -267,26 +327,48 @@ $('widthHint').onclick=()=>{ fitWidthToImage(); };
 $('copyBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText(codeInput.value); toast('✅ Copied!'); }catch{ toast('Copy failed'); } };
 
 $('downloadBtn').onclick=async()=>{
+  if ($('downloadBtn').disabled) return;
   const lines=codeInput.value.split('\n').length;
   if(lines>250){ toast('Too tall (>250 lines) — splitting is safer'); $('exportAdv').open=true; return; }
-  const scale=pickScale(lines);
+  const qkey=settings.quality || 'fhd';
+  // VECTOR: infinite zoom, zero blur
+  if(qkey==='svg'){
+    setLoading(true, '⏳ Building SVG...');
+    const saved=expandForExport(); await sleep(180);
+    try{
+      const tag=`-${currentLang.id}-${Date.now().toString().slice(-5)}`;
+      const { W, H } = await exportOriginalSVG(tag);
+      toast(`✅ Original SVG • ${W}×${H} vector • zoom forever, zero blur ♾️`);
+    }catch(e){ console.error(e); toast('SVG export failed — try Full HD'); }
+    restoreAfterExport(saved); setLoading(false); return;
+  }
+  const target=QUALITY_TARGETS[qkey] || QUALITY_TARGETS.fhd;
   setLoading(true, '⏳ Rendering...');
   const saved=expandForExport(); await sleep(180);
+  let result=null;
   try{
-    const canvas=await html2canvas(snapBg,{scale, backgroundColor: settings.transparent?null:undefined, useCORS:true, logging:false});
+    const info=computePngScale(snapBg, target.width);
+    result=info;
+    const canvas=await html2canvas(snapBg,{scale:info.scale, backgroundColor: settings.transparent?null:undefined, useCORS:true, logging:false});
     const a=document.createElement('a');
-    a.download=`codesnap-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
+    a.download=`codesnap-${target.file}-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
     a.href=canvas.toDataURL('image/png'); a.click();
-    if(saved.autoWrapped) toast(`✅ Downloaded • auto-wrapped long lines so nothing cut`);
-    else toast(`✅ Downloaded ${lines} lines • ${scale}x • No cut`);
-  }catch(e){ console.error(e); toast('Export failed — try Split'); }
+    if(saved.autoWrapped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • auto-wrapped, nothing cut`);
+    else if(info.capped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • capped for stability, still crisp`);
+    else toast(`✅ ${target.label} • ${info.outW}×${info.outH} • crisp`);
+  }catch(e){ console.error(e); toast('Export failed — try HD or Split'); }
   restoreAfterExport(saved); setLoading(false);
 };
 $('splitBtn').onclick=async()=>{
+  if ($('splitBtn').disabled) return;
   const allLines=codeInput.value.split('\n'), per=settings.splitPer, total=Math.ceil(allLines.length/per);
   if(allLines.length<=per){ toast('Short code — use Download instead'); return; }
   if(total>8){ toast('Too many parts (8 max) — increase lines per image'); return; }
+  const qkey=settings.quality || 'fhd';
+  const isSVG = qkey==='svg';
+  const target=QUALITY_TARGETS[qkey] || QUALITY_TARGETS.fhd;
   const orig=codeInput.value, saved=expandForExport();
+  setLoading(true, '⏳ Exporting parts...');
   try{
     for(let i=0;i<total;i++){
       const chunk=allLines.slice(i*per,(i+1)*per).join('\n');
@@ -295,16 +377,21 @@ $('splitBtn').onclick=async()=>{
       if($('optLines').checked) $('lineNums').innerHTML=Array.from({length:n},(_,k)=>i*per+k+1).join('<br>');
       $('fileLabel').textContent=($('fileName').value||'code')+` (${i+1}/${total})`;
       await sleep(280);
-      const canvas=await html2canvas(snapBg,{scale:pickScale(per), backgroundColor: settings.transparent?null:undefined, useCORS:true, logging:false});
-      const a=document.createElement('a'); a.download=`codesnap-part${i+1}-of-${total}.png`; a.href=canvas.toDataURL('image/png'); a.click();
+      if(isSVG){
+        await exportOriginalSVG(`-part${i+1}-of-${total}`);
+      } else {
+        const info=computePngScale(snapBg, target.width);
+        const canvas=await html2canvas(snapBg,{scale:info.scale, backgroundColor: settings.transparent?null:undefined, useCORS:true, logging:false});
+        const a=document.createElement('a'); a.download=`codesnap-${target.file}-part${i+1}-of-${total}.png`; a.href=canvas.toDataURL('image/png'); a.click();
+      }
       await sleep(350);
     }
-    toast(`✅ ${total} images done — post as thread 🧵`);
+    toast(isSVG ? `✅ ${total} SVG parts done — infinite zoom 🧵` : `✅ ${total} ${target.label} images done — post as thread 🧵`);
   }catch(e){ console.error(e); toast('Split failed'); }
-  doHighlight(orig, currentLang.hljs); updateCode(); restoreAfterExport(saved);
+  doHighlight(orig, currentLang.hljs); updateCode(); restoreAfterExport(saved); setLoading(false);
 };
 
-renderThemes(); renderLangMenu(); setLanguage('python', false); applyTheme();
+renderThemes(); renderLangMenu(); setLanguage('python', false); applyTheme(); updateQualityHint(); setLoading(false);
 
 // --- PWA: service worker + install as app ---
 if ('serviceWorker' in navigator) {

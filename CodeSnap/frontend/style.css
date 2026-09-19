@@ -67,6 +67,8 @@ input[type="range"] { width: 100%; accent-color: #a855f7; cursor: pointer; }
 .seg { display: flex; background: #0b0e14; border: 1px solid #2a3142; border-radius: 12px; padding: 4px; gap: 4px; }
 .seg button { flex: 1; background: transparent; border: none; color: #9aa3b2; padding: 9px 6px; border-radius: 9px; cursor: pointer; font-weight: 700; font-size: 12.5px; width: auto; transition: .15s; }
 .seg button.active { background: linear-gradient(135deg,#8b5cf6,#a855f7); color: #fff; box-shadow: 0 3px 12px rgba(139,92,246,.4); }
+.quality-seg button { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; padding: 8px 4px; }
+.quality-seg button span { font-size: 10.5px; font-weight: 600; opacity: .85; }
 
 .toggle { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1c2230; font-size: 13.5px; cursor: pointer; }
 .toggle:last-child { border-bottom: none; } .toggle input { display: none; }
