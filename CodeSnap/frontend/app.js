@@ -236,7 +236,7 @@ function updateCode() {
   $('fontVal').textContent = settings.fontSize + 'px'; $('padVal').textContent = settings.padding + 'px';
   $('radiusVal').textContent = settings.radius + 'px'; $('lhVal').textContent = settings.lineHeight.toFixed(1);
   $('splitVal').textContent = settings.splitPer;
-  snapBg.style.padding = settings.padding + 'px';
+  snapCard.style.padding = settings.padding + 'px';
 
   if ($('optLines').checked) {
     $('lineNums').style.visibility = 'visible';
