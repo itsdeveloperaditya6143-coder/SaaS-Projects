@@ -145,19 +145,20 @@ hello()</textarea>
       </div>
       <div class="muted small" style="margin-top:6px; text-align:center">Image = with background • PNG = transparent card only, no background</div>
 
+      <div class="quality-section">
+        <label>Quality (crisp on every screen)</label>
+        <div class="seg quality-seg" id="scaleSeg">
+          <button type="button" data-quality="hd">HD<span>720p</span></button>
+          <button type="button" data-quality="fhd" class="active">Full HD<span>1080p ✨</span></button>
+          <button type="button" data-quality="4k">4K<span>2160p</span></button>
+          <button type="button" data-quality="8k">8K<span>4320p 🔥</span></button>
+        </div>
+        <div class="muted small" id="qualityHint" style="margin-top:6px">Full HD • 1920px wide • best for X/LinkedIn</div>
+      </div>
+
       <details id="exportAdv" class="adv">
         <summary><span>⚙️ Advanced export</span><span class="chev">▾</span></summary>
         <div class="adv-body">
-          <div class="adv-group">
-            <label>Quality (crisp on every screen)</label>
-            <div class="seg quality-seg" id="scaleSeg">
-              <button type="button" data-quality="hd">HD<span>720p</span></button>
-              <button type="button" data-quality="fhd" class="active">Full HD<span>1080p ✨</span></button>
-              <button type="button" data-quality="4k">4K<span>2160p</span></button>
-              <button type="button" data-quality="8k">8K<span>4320p 🔥</span></button>
-            </div>
-            <div class="muted small" id="qualityHint" style="margin-top:6px">Full HD • 1920px wide • best for X/LinkedIn</div>
-          </div>
           <div><label>Split: lines per image <b id="splitVal">35</b></label><input type="range" id="splitLines" min="15" max="60" value="35"></div>
           <button id="splitBtn" class="btn ghost full">✂️ Split & download parts</button>
           <div class="muted small" style="margin-top:8px">Tip: under 50 lines = 1 perfect image. Over 80 = split works best for X.</div>
