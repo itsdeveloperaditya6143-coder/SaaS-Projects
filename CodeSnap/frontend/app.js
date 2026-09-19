@@ -67,12 +67,12 @@ let currentTheme = THEMES[0];
 let currentLang = LANGUAGES[0];
 const settings = { font:"'JetBrains Mono',monospace", fontSize:15, padding:48, radius:14, lineHeight:1.6, shadow:'deep', quality:'fhd', splitPer:35, transparent:false };
 
-// HD / Full HD / 4K = PNG width-targeted export. Original SVG = true vector (infinite zoom, zero blur).
+// HD / Full HD / 4K / 8K = PNG width-targeted export. 8K = max sharpness, zero blur on zoom.
 const QUALITY_TARGETS = {
   hd:  { width: 1280, label: 'HD',      file: 'hd',       desc: '1280px wide • small file • fast share' },
   fhd: { width: 1920, label: 'Full HD', file: 'fhd',      desc: '1920px wide • best for X/LinkedIn' },
   '4k':{ width: 3840, label: '4K Ultra',file: '4k',       desc: '3840px wide • max detail • larger file' },
-  svg: { vector: true, label: 'Original',file: 'original',desc: 'Vector SVG • infinite zoom • zero blur' },
+  '8k':{ width: 7680, label: '8K Ultra',file: '8k',       desc: '7680px wide • sharpest • desktop recommended' },
 };
 
 const $ = (id) => document.getElementById(id);
@@ -214,51 +214,36 @@ function updateQualityHint(){
   const q = QUALITY_TARGETS[settings.quality] || QUALITY_TARGETS.fhd;
   const el = $('qualityHint');
   if (!el) return;
-  if (q.vector) el.textContent = 'Original SVG • vector • infinite zoom, zero blur • best for blogs/docs';
-  else el.textContent = `${q.label} • ${q.width}px wide • ${q.desc}`;
+  el.textContent = `${q.label} • ${q.width}px wide • ${q.desc}`;
 }
 function computePngScale(el, targetW){
   const w = el.offsetWidth || 800;
   const h = el.offsetHeight || 400;
   let scale = targetW / w;
-  // clamp: never worse than CSS (1), max 5 so true 4K width is reachable on typical cards
-  scale = Math.min(5, Math.max(1, scale));
-  // memory guard: cap total pixels ~24MP (mobile-safe, avoids crash/glitch)
-  const MAX_PIXELS = 24000000;
+  // clamp: never worse than CSS (1), max 10 so true 8K width is reachable on typical cards
+  scale = Math.min(10, Math.max(1, scale));
+  // memory guard: HD/FHD/4K cap at 24MP (mobile-safe), 8K allows up to 64MP (desktop).
+  // Beyond that we auto-cap instead of crashing with a blank/glitched image.
+  const MAX_PIXELS = targetW >= 7000 ? 64000000 : 24000000;
   const est = (w * scale) * (h * scale);
   let capped = false;
   if (est > MAX_PIXELS) {
     scale = Math.sqrt(MAX_PIXELS / (w * h));
     capped = true;
   }
+  // absolute browser canvas limits (Chrome ~16384px per side)
+  const outW0 = w * scale, outH0 = h * scale;
+  if (outW0 > 8000 || outH0 > 16000) {
+    scale = Math.min(8000 / w, 16000 / h);
+    capped = true;
+  }
   // round to 2 decimals to avoid subpixel blur
   scale = Math.max(1, Math.round(scale * 100) / 100);
   return { scale, capped, cssW: w, cssH: h, outW: Math.round(w * scale), outH: Math.round(h * scale) };
 }
-async function exportOriginalSVG(suffix=''){
-  // True vector export via foreignObject: text stays sharp at any zoom (no blur).
-  // Assumes expandForExport() already called so full code is measurable.
-  const W = snapBg.offsetWidth;
-  const H = snapBg.offsetHeight;
-  const clone = snapBg.cloneNode(true);
-  // Inline computed styles so highlight.js colors survive (cross-origin CSS can't be read directly).
-  const srcEls = [snapBg, ...snapBg.querySelectorAll('*')];
-  const cloneEls = [clone, ...clone.querySelectorAll('*')];
-  srcEls.forEach((src, i) => {
-    try { cloneEls[i].setAttribute('style', getComputedStyle(src).cssText); } catch(e) {}
-  });
-  clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
-  clone.style.width = W + 'px';
-  clone.style.height = H + 'px';
-  clone.style.margin = '0';
-  const svgText = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><foreignObject x="0" y="0" width="${W}" height="${H}">${new XMLSerializer().serializeToString(clone)}</foreignObject></svg>`;
-  const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
-  const a = document.createElement('a');
-  a.download = `codesnap-original${suffix}.svg`;
-  a.href = URL.createObjectURL(blob);
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
-  return { W, H };
+async function renderPng(snapEl, scale){
+  const canvas = await html2canvas(snapEl, { scale, backgroundColor: settings.transparent ? null : undefined, useCORS: true, logging: false });
+  return canvas;
 }
 function expandForExport(){
   document.body.classList.add('exporting');
@@ -291,12 +276,7 @@ function setLoading(on, label){
   if(btn) btn.disabled=on;
   if(split) split.disabled=on;
   const lbl=$('dlLabel');
-  if(lbl) lbl.textContent = on ? label : (settings.quality==='svg' ? '⬇ Download SVG' : '⬇ Download PNG');
-  // keep button label in sync when idle
-  if(!on && lbl) {
-    const q = QUALITY_TARGETS[settings.quality];
-    lbl.textContent = (q && q.vector) ? '⬇ Download SVG' : '⬇ Download PNG';
-  }
+  if(lbl) lbl.textContent = on ? label : '⬇ Download PNG';
 }
 
 // events
@@ -331,32 +311,36 @@ $('downloadBtn').onclick=async()=>{
   const lines=codeInput.value.split('\n').length;
   if(lines>250){ toast('Too tall (>250 lines) — splitting is safer'); $('exportAdv').open=true; return; }
   const qkey=settings.quality || 'fhd';
-  // VECTOR: infinite zoom, zero blur
-  if(qkey==='svg'){
-    setLoading(true, '⏳ Building SVG...');
-    const saved=expandForExport(); await sleep(180);
-    try{
-      const tag=`-${currentLang.id}-${Date.now().toString().slice(-5)}`;
-      const { W, H } = await exportOriginalSVG(tag);
-      toast(`✅ Original SVG • ${W}×${H} vector • zoom forever, zero blur ♾️`);
-    }catch(e){ console.error(e); toast('SVG export failed — try Full HD'); }
-    restoreAfterExport(saved); setLoading(false); return;
-  }
   const target=QUALITY_TARGETS[qkey] || QUALITY_TARGETS.fhd;
-  setLoading(true, '⏳ Rendering...');
+  if(qkey==='8k' && lines>120){ toast('8K + long code may be heavy — Split is safer'); }
+  setLoading(true, qkey==='8k' ? '⏳ Rendering 8K (takes a few sec)...' : '⏳ Rendering...');
   const saved=expandForExport(); await sleep(180);
-  let result=null;
   try{
     const info=computePngScale(snapBg, target.width);
-    result=info;
-    const canvas=await html2canvas(snapBg,{scale:info.scale, backgroundColor: settings.transparent?null:undefined, useCORS:true, logging:false});
+    let canvas=null;
+    try {
+      canvas=await renderPng(snapBg, info.scale);
+    } catch(e8k) {
+      // 8K OOM fallback: automatically retry at 4K so user never gets a glitch/blank
+      console.warn('High-res render failed, falling back:', e8k);
+      if(qkey==='8k'){
+        const fb=computePngScale(snapBg, QUALITY_TARGETS['4k'].width);
+        canvas=await renderPng(snapBg, fb.scale);
+        const a=document.createElement('a');
+        a.download=`codesnap-4k-fallback-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
+        a.href=canvas.toDataURL('image/png'); a.click();
+        toast(`⚠️ 8K ran out of memory — gave you 4K ${fb.outW}×${fb.outH} instead • try Split for long code`);
+        restoreAfterExport(saved); setLoading(false); return;
+      }
+      throw e8k;
+    }
     const a=document.createElement('a');
     a.download=`codesnap-${target.file}-${currentLang.id}-${Date.now().toString().slice(-5)}.png`;
     a.href=canvas.toDataURL('image/png'); a.click();
     if(saved.autoWrapped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • auto-wrapped, nothing cut`);
     else if(info.capped) toast(`✅ ${target.label} • ${info.outW}×${info.outH} • capped for stability, still crisp`);
     else toast(`✅ ${target.label} • ${info.outW}×${info.outH} • crisp`);
-  }catch(e){ console.error(e); toast('Export failed — try HD or Split'); }
+  }catch(e){ console.error(e); toast('Export failed — try Full HD or Split'); }
   restoreAfterExport(saved); setLoading(false);
 };
 $('splitBtn').onclick=async()=>{
@@ -365,7 +349,6 @@ $('splitBtn').onclick=async()=>{
   if(allLines.length<=per){ toast('Short code — use Download instead'); return; }
   if(total>8){ toast('Too many parts (8 max) — increase lines per image'); return; }
   const qkey=settings.quality || 'fhd';
-  const isSVG = qkey==='svg';
   const target=QUALITY_TARGETS[qkey] || QUALITY_TARGETS.fhd;
   const orig=codeInput.value, saved=expandForExport();
   setLoading(true, '⏳ Exporting parts...');
@@ -377,16 +360,19 @@ $('splitBtn').onclick=async()=>{
       if($('optLines').checked) $('lineNums').innerHTML=Array.from({length:n},(_,k)=>i*per+k+1).join('<br>');
       $('fileLabel').textContent=($('fileName').value||'code')+` (${i+1}/${total})`;
       await sleep(280);
-      if(isSVG){
-        await exportOriginalSVG(`-part${i+1}-of-${total}`);
-      } else {
-        const info=computePngScale(snapBg, target.width);
-        const canvas=await html2canvas(snapBg,{scale:info.scale, backgroundColor: settings.transparent?null:undefined, useCORS:true, logging:false});
-        const a=document.createElement('a'); a.download=`codesnap-${target.file}-part${i+1}-of-${total}.png`; a.href=canvas.toDataURL('image/png'); a.click();
+      const info=computePngScale(snapBg, target.width);
+      let canvas=null;
+      try {
+        canvas=await renderPng(snapBg, info.scale);
+      } catch(ePart) {
+        console.warn('Part render failed, trying 4K fallback:', ePart);
+        const fb=computePngScale(snapBg, QUALITY_TARGETS['4k'].width);
+        canvas=await renderPng(snapBg, fb.scale);
       }
+      const a=document.createElement('a'); a.download=`codesnap-${target.file}-part${i+1}-of-${total}.png`; a.href=canvas.toDataURL('image/png'); a.click();
       await sleep(350);
     }
-    toast(isSVG ? `✅ ${total} SVG parts done — infinite zoom 🧵` : `✅ ${total} ${target.label} images done — post as thread 🧵`);
+    toast(`✅ ${total} ${target.label} images done — post as thread 🧵`);
   }catch(e){ console.error(e); toast('Split failed'); }
   doHighlight(orig, currentLang.hljs); updateCode(); restoreAfterExport(saved); setLoading(false);
 };
