@@ -121,7 +121,7 @@ const LANGUAGES = [
   { id:'json', name:'JSON', icon:'🧾', hljs:'json', ext:'data.json', sample:'{\n  "name": "Aditya",\n  "streak": 7,\n  "project": "CodeSnap"\n}' },
 ];
 
-let currentTheme = THEMES[0];
+let currentTheme = THEMES.find(t => t.id === 'light');
 let currentLang = LANGUAGES[0];
 const settings = { font:"'JetBrains Mono',monospace", fontSize:15, padding:48, radius:14, lineHeight:1.6, shadow:'deep', quality:'fhd', splitPer:35 };
 
