@@ -68,9 +68,9 @@ hello()</textarea>
       <div class="step"><span class="num">2</span> Style</div>
       <div class="muted small">Pick a theme:</div>
       <div class="filters">
-        <button class="filter active" data-filter="all">All (73)</button>
+        <button class="filter" data-filter="all">All (73)</button>
         <button class="filter" data-filter="dark">Dark (16)</button>
-        <button class="filter" data-filter="light">Light (6)</button>
+        <button class="filter active" data-filter="light">Light (6)</button>
         <button class="filter" data-filter="gradient">Gradient (14)</button>
         <button class="filter" data-filter="gaming">Gaming (5)</button>
         <button class="filter" data-filter="cyberpunk">Cyberpunk (5)</button>
@@ -96,10 +96,10 @@ hello()</textarea>
         </div>
       </div>
       <div class="sliders2">
-        <div><label>Font size <b id="fontVal">15px</b></label><input type="range" id="fontSize" min="12" max="24" value="15"></div>
-        <div><label>Padding <b id="padVal">48px</b></label><input type="range" id="padding" min="16" max="120" value="48"></div>
-        <div><label>Corners <b id="radiusVal">14px</b></label><input type="range" id="radius" min="0" max="28" value="14"></div>
-        <div><label>Line height <b id="lhVal">1.6</b></label><input type="range" id="lineHeight" min="12" max="20" value="16"></div>
+        <div><label>Font size <b id="fontVal">13px</b></label><input type="range" id="fontSize" min="12" max="24" value="13"></div>
+        <div><label>Padding <b id="padVal">14px</b></label><input type="range" id="padding" min="5" max="120" value="14"></div>
+        <div><label>Corners <b id="radiusVal">10px</b></label><input type="range" id="radius" min="0" max="28" value="10"></div>
+        <div><label>Line height <b id="lhVal">1.3</b></label><input type="range" id="lineHeight" min="12" max="20" value="13"></div>
       </div>
       <div class="adv-group">
         <label>Shadow</label>
@@ -114,13 +114,11 @@ hello()</textarea>
       <label class="toggle"><span>Line numbers</span><input type="checkbox" id="optLines" checked><i></i></label>
       <label class="toggle"><span>Title bar</span><input type="checkbox" id="optTitle" checked><i></i></label>
       <label class="toggle"><span>Watermark</span><input type="checkbox" id="optWater" checked><i></i></label>
-      <label class="toggle"><span>Wrap long lines (recommended)</span><input type="checkbox" id="optWrap" checked><i></i></label>
 
       <div class="mexport mobile-only">
         <div class="mexport-actions">
-          <button class="btn primary dl"><span>🖼️ Image</span></button>
-          <button class="btn ghost png"><span>✨ PNG</span></button>
-          <button class="btn ghost copy">Copy</button>
+          <button class="btn primary dl"><span>Download Image</span></button>
+          <button class="btn ghost png"><span>Download PNG</span></button>
         </div>
         <div class="muted small" style="margin-top:6px;text-align:center">Image = with background • PNG = transparent card only</div>
         <div class="quality-section">
@@ -173,9 +171,8 @@ hello()</textarea>
       <button id="widthHint" class="split-hint width-hint mhide" style="display:none">↔️ <span id="widthText">Line too wide — will be cut</span> <b>• Tap to Fit →</b></button>
 
       <div class="export-actions mhide">
-        <button id="downloadBtn" class="btn primary"><span id="dlLabel">🖼️ Image</span></button>
-        <button id="pngBtn" class="btn ghost"><span id="pngLabel">✨ PNG</span></button>
-        <button id="copyBtn" class="btn ghost">Copy</button>
+        <button id="downloadBtn" class="btn primary"><span id="dlLabel">Download Image</span></button>
+        <button id="pngBtn" class="btn ghost"><span id="pngLabel">Download PNG</span></button>
       </div>
       <div class="muted small mhide" style="margin-top:6px; text-align:center">Image = with background • PNG = transparent card only, no background</div>
 

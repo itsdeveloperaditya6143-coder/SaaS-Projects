@@ -123,7 +123,7 @@ const LANGUAGES = [
 
 let currentTheme = THEMES.find(t => t.id === 'light');
 let currentLang = LANGUAGES[0];
-const settings = { font:"'JetBrains Mono',monospace", fontSize:15, padding:48, radius:14, lineHeight:1.6, shadow:'deep', quality:'fhd', splitPer:35 };
+const settings = { font:"'JetBrains Mono',monospace", fontSize:13, padding:14, radius:10, lineHeight:1.3, shadow:'deep', quality:'fhd', splitPer:35 };
 
 // HD / Full HD / 4K / 8K = PNG width-targeted export. 8K = max sharpness, zero blur on zoom.
 const QUALITY_TARGETS = {
@@ -223,7 +223,7 @@ function updateCode() {
   let text = codeInput.value || '// paste code...';
   if (text.length > 20000) { text = text.slice(0,20000); codeInput.value = text; toast('Trimmed to 20k chars for stability'); }
   const rawLines = text.split('\n').length;
-  const wrap = $('optWrap').checked;
+  const wrap = true;
   const lines = wrap ? countVisualLines(text) : rawLines;
   $('lineCount').textContent = lines; $('charCount').textContent = text.length;
   $('fileLabel').textContent = $('fileName').value || 'untitled.txt';
@@ -239,11 +239,11 @@ function updateCode() {
   snapBg.style.padding = settings.padding + 'px';
 
   if ($('optLines').checked) {
-    $('lineNums').style.display = 'block';
+    $('lineNums').style.visibility = 'visible';
     const nums = wrap ? buildLineNums(text) : Array.from({length:rawLines},(_,i)=>String(i+1));
     $('lineNums').innerHTML = nums.map(n=>n||'&nbsp;').join('<br>');
   }
-  else $('lineNums').style.display = 'none';
+  else $('lineNums').style.visibility = 'hidden';
   $('dots').style.visibility = $('optDots').checked ? 'visible' : 'hidden';
   $('titleBar').style.display = $('optTitle').checked ? 'flex' : 'none';
   $('watermark').style.display = $('optWater').checked ? 'block' : 'none';
@@ -259,7 +259,7 @@ function updateCode() {
 function checkWidthOverflow(){
   const pre=$('preOut'), hint=$('widthHint');
   if(!pre||!hint) return;
-  const wrapOn=$('optWrap').checked;
+  const wrapOn=true;
   // wrap ON = never cuts horizontally
   if(wrapOn){ hint.style.display='none'; return; }
   const overflow = pre.scrollWidth > pre.clientWidth + 8;
@@ -271,31 +271,9 @@ function checkWidthOverflow(){
     if(pill){ pill.className='status-pill warn'; }
   } else hint.style.display='none';
 }
-// One-tap Fit: shrink font → shrink padding → enable wrap as last resort. No complications for user.
+// Wrap is always on now — nothing to fit.
 function fitWidthToImage(){
-  const pre=$('preOut');
-  if(!pre) return;
-  // if already wrapped, nothing to fit
-  if($('optWrap').checked){ toast('Already wrapped — fits perfectly ✓'); return; }
-  let fs=settings.fontSize, pad=settings.padding;
-  // try shrinking font down to 13px
-  while(fs>13 && pre.scrollWidth>pre.clientWidth+8){ fs--; settings.fontSize=fs; applyThemeSilent(); }
-  function applyThemeSilent(){
-    codeOut.style.fontSize=settings.fontSize+'px'; $('lineNums').style.fontSize=settings.fontSize+'px';
-    $('fontSize').value=settings.fontSize; $('fontVal').textContent=settings.fontSize+'px';
-    // force reflow so scrollWidth updates
-    void pre.offsetWidth;
-  }
-  if(pre.scrollWidth<=pre.clientWidth+8){
-    $('padding').value=settings.padding; toast(`✅ Fitted by shrinking font to ${fs}px`);
-    updateCode(); return;
-  }
-  // try shrinking padding
-  while(pad>24 && pre.scrollWidth>pre.clientWidth+8){ pad-=4; settings.padding=pad; snapBg.style.padding=pad+'px'; $('padding').value=pad; $('padVal').textContent=pad+'px'; void pre.offsetWidth; }
-  if(pre.scrollWidth<=pre.clientWidth+8){ toast(`✅ Fitted with font ${fs}px + padding ${pad}px`); updateCode(); return; }
-  // last resort: enable wrap (guaranteed, best for X)
-  $('optWrap').checked=true; updateCode();
-  toast('✅ Auto-enabled Wrap — best for sharing on X');
+  toast('Already wrapped — fits perfectly ✓');
 }
 function syncScroll(){ const pre=$('preOut'); if(pre) $('lineNums').style.transform=`translateY(${-pre.scrollTop}px)`; }
 function toast(msg){ const t=$('toast'); t.textContent=msg; clearTimeout(t._h); t._h=setTimeout(()=>t.textContent='',3200); }
@@ -343,7 +321,7 @@ async function renderPng(snapEl, scale){
 function expandForExport(){
   document.body.classList.add('exporting');
   const pre=$('preOut'), wrap=document.querySelector('.code-wrap');
-  const wrapOn=$('optWrap').checked;
+  const wrapOn=true;
   const hOverflow = !wrapOn && (pre.scrollWidth > pre.clientWidth + 8);
   const saved={ preMax:pre.style.maxHeight, preOver:pre.style.overflow, wrapMax:wrap.style.maxHeight, wrapOver:wrap.style.overflow, cardMax:snapCard.style.maxWidth, ws:codeOut.style.whiteSpace, wb:codeOut.style.wordBreak, autoWrapped:false };
   pre.style.maxHeight='none'; pre.style.overflow='visible'; pre.scrollTop=0; pre.scrollLeft=0;
@@ -392,7 +370,7 @@ codeInput.addEventListener('input', scheduleUpdate);
 });
 $('lineHeight').addEventListener('input', e=>{ settings.lineHeight=parseInt(e.target.value,10)/10; updateCode(); });
 $('splitLines').addEventListener('input', e=>{ settings.splitPer=parseInt(e.target.value,10)||35; updateCode(); });
-['optDots','optLines','optTitle','optWater','optWrap'].forEach(id=>$(id).addEventListener('change', ()=>{ updateCode(); }));
+['optDots','optLines','optTitle','optWater'].forEach(id=>$(id).addEventListener('change', ()=>{ updateCode(); }));
 document.querySelectorAll('.filter').forEach(b=>b.onclick=()=>{ document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active')); b.classList.add('active'); renderThemes(b.dataset.filter); });
 document.querySelectorAll('#scaleSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#scaleSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.quality=b.dataset.quality || 'fhd'; updateQualityHint(); setLoading(false); if(typeof gtag==='function') gtag('event','quality_change',{quality:b.dataset.quality}); });
 document.querySelectorAll('#fontSeg button').forEach(b=>b.onclick=()=>{ document.querySelectorAll('#fontSeg button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); settings.font=b.dataset.font; updateCode(); });
@@ -403,7 +381,6 @@ $('sampleBtn').onclick=()=>{ setLanguage(currentLang.id, true); toast('✨ '+cur
 $('preOut').addEventListener('scroll', syncScroll);
 $('splitHint').onclick=()=>{ $('exportAdv').open=true; $('splitBtn').scrollIntoView({behavior:'smooth', block:'center'}); };
 $('widthHint').onclick=()=>{ fitWidthToImage(); };
-$('copyBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText(codeInput.value); toast('✅ Copied!'); }catch{ toast('Copy failed'); } };
 
 // mobile export wiring (duplicated controls in scrollable area)
 document.querySelectorAll('.mexport .quality-seg button').forEach(b=>b.onclick=()=>{
@@ -419,7 +396,6 @@ document.querySelectorAll('.mexport .splitLines').forEach(el=>el.oninput=()=>{ s
 document.querySelectorAll('.mexport .splitBtn').forEach(el=>el.onclick=()=>{ if($('splitBtn')) $('splitBtn').click(); });
 document.querySelectorAll('.mexport .dl').forEach(el=>el.onclick=()=>doExport(false));
 document.querySelectorAll('.mexport .png').forEach(el=>el.onclick=()=>doExport(true));
-document.querySelectorAll('.mexport .copy').forEach(el=>el.onclick=async()=>{ try{ await navigator.clipboard.writeText(codeInput.value); toast('✅ Copied!'); }catch{ toast('Copy failed'); } });
 
 // --- shared export core (background fix: backgroundColor:null removes the white matte around corners) ---
 async function doExport(transparent){
@@ -501,7 +477,7 @@ $('splitBtn').onclick=async()=>{
   doHighlight(orig, currentLang.hljs); updateCode(); restoreAfterExport(saved); setLoading(false);
 };
 
-renderThemes(); renderLangMenu(); setLanguage('python', false); applyTheme(); updateQualityHint(); setLoading(false);
+renderThemes(document.querySelector('.filter.active')?.dataset.filter || 'light'); renderLangMenu(); setLanguage('python', false); applyTheme(); updateQualityHint(); setLoading(false);
 
 // --- PWA: service worker + install as app ---
 if ('serviceWorker' in navigator) {
