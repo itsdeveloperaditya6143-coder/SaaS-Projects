@@ -4,7 +4,7 @@ import numpy as np
 from PIL import Image
 from rembg import remove, new_session
 
-MODEL_NAME = "u2net"
+MODEL_NAME = "silueta"
 _session = None
 _model_ready = False
 
