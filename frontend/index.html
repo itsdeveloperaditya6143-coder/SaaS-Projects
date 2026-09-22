@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BulkBGRemover</title>
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M9 3v18"/>
+                    <path d="M3 9h6"/>
+                    <path d="M3 15h6"/>
+                    <circle cx="16" cy="12" r="2"/>
+                    <path d="M18 18l-4-4"/>
+                </svg>
+                <h1>BulkBGRemover</h1>
+            </div>
+            <p class="tagline">Remove backgrounds instantly. Free. Unlimited. Offline.</p>
+        </header>
+
+        <div class="model-banner" id="modelBanner">
+            <div class="spinner"></div>
+            <span>Loading AI model (first time only)...</span>
+        </div>
+
+        <div class="upload-zone" id="dropZone">
+            <div class="upload-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+            </div>
+            <p class="upload-text">Drag & drop your image here</p>
+            <p class="upload-sub">or click to browse files</p>
+            <p class="upload-formats">Supports JPG, PNG, WEBP, BMP, TIFF, GIF</p>
+            <input type="file" id="fileInput" multiple accept="image/*" hidden>
+        </div>
+
+        <div class="controls" id="controls" style="display:none">
+            <div class="file-count">
+                <span id="fileCount">0</span> image(s) selected
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-outline" id="clearBtn">Clear</button>
+                <button class="btn btn-primary" id="processBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14"/>
+                        <path d="M12 5l7 7-7 7"/>
+                    </svg>
+                    Remove Background
+                </button>
+            </div>
+        </div>
+
+        <div class="progress-section" id="progressSection" style="display:none">
+            <div class="progress-header">
+                <span id="progressText">Processing...</span>
+                <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p class="progress-detail" id="progressDetail">Preparing...</p>
+        </div>
+
+        <!-- Editor Section -->
+        <div class="editor-section" id="editorSection">
+            <div class="editor-layout">
+                <!-- Left: Images -->
+                <div class="editor-left">
+                    <div class="editor-left-header">
+                        <h2>Edit Result</h2>
+                        <button class="btn btn-outline btn-sm" id="backBtn">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 12H5"/>
+                                <path d="M12 19l-7-7 7-7"/>
+                            </svg>
+                            New
+                        </button>
+                    </div>
+                    <div class="comparison-container" id="comparisonContainer">
+                        <canvas id="canvasOriginal"></canvas>
+                        <canvas id="canvasProcessed"></canvas>
+                        <div class="comparison-slider" id="comparisonSlider"></div>
+                        <span class="comparison-label left">Original</span>
+                        <span class="comparison-label right">Result</span>
+                    </div>
+                </div>
+
+                <!-- Right: Controls -->
+                <div class="editor-right">
+                    <div class="editor-right-scroll">
+                        <!-- Background Picker -->
+                        <div class="bg-picker-section">
+                            <div class="bg-tabs">
+                                <button class="bg-tab active" data-tab="transparent">Transparent</button>
+                                <button class="bg-tab" data-tab="colors">Colors</button>
+                                <button class="bg-tab" data-tab="gradients">Gradients</button>
+                                <button class="bg-tab" data-tab="custom">Image</button>
+                            </div>
+
+                            <div class="bg-panel" id="panelTransparent">
+                                <div class="bg-options">
+                                    <div class="bg-color transparent active" data-color="transparent" title="Transparent"></div>
+                                </div>
+                            </div>
+
+                            <div class="bg-panel" id="panelColors" style="display:none">
+                                <div class="bg-options">
+                                    <div class="bg-color" data-color="#ffffff" style="background:#ffffff" title="White"></div>
+                                    <div class="bg-color" data-color="#000000" style="background:#000000" title="Black"></div>
+                                    <div class="bg-color" data-color="#f43f5e" style="background:#f43f5e" title="Red"></div>
+                                    <div class="bg-color" data-color="#ef4444" style="background:#ef4444" title="Bright Red"></div>
+                                    <div class="bg-color" data-color="#f97316" style="background:#f97316" title="Orange"></div>
+                                    <div class="bg-color" data-color="#f59e0b" style="background:#f59e0b" title="Yellow"></div>
+                                    <div class="bg-color" data-color="#84cc16" style="background:#84cc16" title="Lime"></div>
+                                    <div class="bg-color" data-color="#22c55e" style="background:#22c55e" title="Green"></div>
+                                    <div class="bg-color" data-color="#14b8a6" style="background:#14b8a6" title="Teal"></div>
+                                    <div class="bg-color" data-color="#06b6d4" style="background:#06b6d4" title="Cyan"></div>
+                                    <div class="bg-color" data-color="#3b82f6" style="background:#3b82f6" title="Blue"></div>
+                                    <div class="bg-color" data-color="#6366f1" style="background:#6366f1" title="Indigo"></div>
+                                    <div class="bg-color" data-color="#8b5cf6" style="background:#8b5cf6" title="Purple"></div>
+                                    <div class="bg-color" data-color="#a855f7" style="background:#a855f7" title="Violet"></div>
+                                    <div class="bg-color" data-color="#ec4899" style="background:#ec4899" title="Pink"></div>
+                                    <div class="bg-color" data-color="#78716c" style="background:#78716c" title="Gray"></div>
+                                    <div class="color-picker-wrap">
+                                        <input type="color" id="customColorPicker" value="#3b82f6" class="color-picker-input">
+                                        <span class="color-picker-label">Custom</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-panel" id="panelGradients" style="display:none">
+                                <div class="bg-options gradients-grid">
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #667eea, #764ba2)" style="background:linear-gradient(135deg, #667eea, #764ba2)" title="Indigo Violet"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #f093fb, #f5576c)" style="background:linear-gradient(135deg, #f093fb, #f5576c)" title="Pink Rose"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #4facfe, #00f2fe)" style="background:linear-gradient(135deg, #4facfe, #00f2fe)" title="Blue Cyan"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #43e97b, #38f9d7)" style="background:linear-gradient(135deg, #43e97b, #38f9d7)" title="Green Teal"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #fa709a, #fee140)" style="background:linear-gradient(135deg, #fa709a, #fee140)" title="Pink Yellow"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #a18cd1, #fbc2eb)" style="background:linear-gradient(135deg, #a18cd1, #fbc2eb)" title="Lavender"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #fccb90, #d57eeb)" style="background:linear-gradient(135deg, #fccb90, #d57eeb)" title="Peach Purple"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #e0c3fc, #8ec5fc)" style="background:linear-gradient(135deg, #e0c3fc, #8ec5fc)" title="Sky Blue"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #f5576c, #ff6a00)" style="background:linear-gradient(135deg, #f5576c, #ff6a00)" title="Red Orange"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #0ba360, #3cba92)" style="background:linear-gradient(135deg, #0ba360, #3cba92)" title="Forest"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #ff9a9e, #fecfef)" style="background:linear-gradient(135deg, #ff9a9e, #fecfef)" title="Blush"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #a1c4fd, #c2e9fb)" style="background:linear-gradient(135deg, #a1c4fd, #c2e9fb)" title="Ice Blue"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #ffecd2, #fcb69f)" style="background:linear-gradient(135deg, #ffecd2, #fcb69f)" title="Sunset"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #ff0844, #ffb199)" style="background:linear-gradient(135deg, #ff0844, #ffb199)" title="Coral"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #0c0c1d, #1a1a2e)" style="background:linear-gradient(135deg, #0c0c1d, #1a1a2e)" title="Dark Navy"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #2d1b69, #11001c)" style="background:linear-gradient(135deg, #2d1b69, #11001c)" title="Deep Purple"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #000000, #434343)" style="background:linear-gradient(135deg, #000000, #434343)" title="Black Gray"></div>
+                                    <div class="bg-gradient" data-gradient="linear-gradient(135deg, #141e30, #243b55)" style="background:linear-gradient(135deg, #141e30, #243b55)" title="Midnight"></div>
+                                </div>
+                                <div class="gradient-custom-wrap">
+                                    <input type="color" id="gradColor1" value="#667eea" class="gradient-color-input">
+                                    <span class="gradient-sep">&rarr;</span>
+                                    <input type="color" id="gradColor2" value="#764ba2" class="gradient-color-input">
+                                    <button class="gradient-apply-btn" id="applyGradient">Apply</button>
+                                </div>
+                            </div>
+
+                            <div class="bg-panel" id="panelCustom" style="display:none">
+                                <div class="bg-options">
+                                    <div class="bg-upload-zone" id="customBgUpload">
+                                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                            <polyline points="17 8 12 3 7 8"/>
+                                            <line x1="12" y1="3" x2="12" y2="15"/>
+                                        </svg>
+                                        <span>Upload background image</span>
+                                        <span class="bg-upload-hint">JPG, PNG, WEBP</span>
+                                    </div>
+                                    <div class="bg-preview" id="customBgPreview" style="display:none">
+                                        <img id="customBgThumb" src="" alt="Custom background">
+                                        <button class="bg-preview-remove" id="removeCustomBg">&times;</button>
+                                    </div>
+                                    <input type="file" id="customBgInput" accept="image/*" hidden>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Download -->
+                        <div class="download-section">
+                            <div class="download-options">
+                                <a class="download-btn" id="downloadPng" download>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                        <polyline points="7 10 12 15 17 10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                    PNG <span class="format">(transparent)</span>
+                                </a>
+                                <a class="download-btn primary" id="downloadJpg" download>
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                        <polyline points="7 10 12 15 17 10"/>
+                                        <line x1="12" y1="15" x2="12" y2="3"/>
+                                    </svg>
+                                    JPG <span class="format">(with bg)</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Results -->
+        <div class="results-section" id="resultsSection" style="display:none">
+            <div class="results-header">
+                <h2>Results</h2>
+                <div class="results-actions">
+                    <button class="btn btn-outline" id="newBatchBtn">New Batch</button>
+                    <button class="btn btn-primary" id="downloadAllBtn">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download All (ZIP)
+                    </button>
+                </div>
+            </div>
+            <div class="stats" id="stats"></div>
+            <div class="results-grid" id="resultsGrid"></div>
+        </div>
+
+        <div class="error-toast" id="errorToast" style="display:none"></div>
+    </div>
+
+    <footer>
+        <p>BulkBGRemover &mdash; Built with Python + U&sup2;-Net. 100% local. No uploads to any server.</p>
+    </footer>
+
+    <script src="static/config.js"></script>
+    <script src="static/script.js"></script>
+</body>
+</html>

@@ -4,10 +4,12 @@ import zipfile
 import time
 import json
 from flask import Flask, request, jsonify, send_file, render_template, Response
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from remover import remove_background, preload_model, is_model_ready
 
 app = Flask(__name__)
+CORS(app)
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
 app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "uploads")
 app.config["RESULT_FOLDER"] = os.path.join(os.path.dirname(__file__), "results")
