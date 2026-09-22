@@ -1,4 +1,5 @@
 import io
+import gc
 import threading
 import numpy as np
 from PIL import Image
@@ -29,34 +30,23 @@ def is_model_ready():
     return _model_ready
 
 
-def clean_alpha(img: Image.Image) -> Image.Image:
-    arr = np.array(img)
-    alpha = arr[:, :, 3]
-    alpha[alpha < 60] = 0
-    alpha[alpha > 180] = 255
-    from scipy.ndimage import binary_erosion, binary_dilation
-    mask = alpha > 128
-    cleaned = binary_erosion(mask, iterations=2)
-    cleaned = binary_dilation(cleaned, iterations=1)
-    alpha[~cleaned] = 0
-    arr[:, :, 3] = alpha
-    return Image.fromarray(arr, "RGBA")
-
-
 def remove_background(input_bytes: bytes) -> bytes:
     session = get_session()
-    result = remove(
-        input_bytes,
-        session=session,
-        alpha_matting=True,
-        alpha_matting_foreground_threshold=200,
-        alpha_matting_background_threshold=40,
-        alpha_matting_erode_size=15,
-    )
+    result = remove(input_bytes, session=session)
+
     img = Image.open(io.BytesIO(result)).convert("RGBA")
-    img = clean_alpha(img)
+    arr = np.array(img)
+
+    alpha = arr[:, :, 3]
+    alpha[alpha < 30] = 0
+    alpha[alpha > 200] = 255
+    arr[:, :, 3] = alpha
+
+    img = Image.fromarray(arr, "RGBA")
     buf = io.BytesIO()
     img.save(buf, format="PNG", optimize=True)
+    del arr, alpha, img
+    gc.collect()
     return buf.getvalue()
 
 
