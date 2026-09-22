@@ -1,3 +1,10 @@
+// --- DOM Elements ---
+const landingPage = document.getElementById("landingPage");
+const appPage = document.getElementById("appPage");
+const modelBanner = document.getElementById("modelBanner");
+const modelBannerText = document.getElementById("modelBannerText");
+const modeBadge = document.getElementById("modeBadge");
+const backToModes = document.getElementById("backToModes");
 const dropZone = document.getElementById("dropZone");
 const fileInput = document.getElementById("fileInput");
 const controls = document.getElementById("controls");
@@ -14,7 +21,6 @@ const comparisonContainer = document.getElementById("comparisonContainer");
 const canvasOriginal = document.getElementById("canvasOriginal");
 const canvasProcessed = document.getElementById("canvasProcessed");
 const comparisonSlider = document.getElementById("comparisonSlider");
-const bgOptions = document.getElementById("bgOptions");
 const downloadPng = document.getElementById("downloadPng");
 const downloadJpg = document.getElementById("downloadJpg");
 const backBtn = document.getElementById("backBtn");
@@ -24,7 +30,6 @@ const stats = document.getElementById("stats");
 const downloadAllBtn = document.getElementById("downloadAllBtn");
 const newBatchBtn = document.getElementById("newBatchBtn");
 const errorToast = document.getElementById("errorToast");
-const modelBanner = document.getElementById("modelBanner");
 const customBgInput = document.getElementById("customBgInput");
 
 let selectedFiles = [];
@@ -37,26 +42,73 @@ let currentBg = "transparent";
 let customBgImage = null;
 let sliderPos = 0.5;
 
+// --- Mode Selection ---
+function selectMode(mode) {
+    currentMode = mode;
+    localStorage.setItem("bgremover_mode", mode);
+    API_URL = mode === "local" ? LOCAL_API_URL : CLOUD_API_URL;
+    launchApp();
+}
+
+function launchApp() {
+    landingPage.style.display = "none";
+    appPage.style.display = "block";
+    modeBadge.textContent = currentMode === "local" ? "LOCAL" : "CLOUD";
+    modeBadge.className = "mode-badge " + currentMode;
+    checkModel();
+}
+
+backToModes.addEventListener("click", () => {
+    localStorage.removeItem("bgremover_mode");
+    currentMode = null;
+    appPage.style.display = "none";
+    landingPage.style.display = "block";
+    modelReady = false;
+    resetAll();
+});
+
+// Auto-launch if mode was previously selected
+if (currentMode) {
+    launchApp();
+}
+
 // --- Model Status ---
 async function checkModel() {
+    modelBanner.classList.add("visible");
+    modelBanner.classList.remove("ready", "error");
+    modelBannerText.textContent = currentMode === "local"
+        ? "Connecting to local server at localhost:5000..."
+        : "Connecting to cloud server...";
+
+    dropZone.style.opacity = "0.5";
+    dropZone.style.pointerEvents = "none";
+
     try {
         const res = await fetch(`${API_URL}/model-status`);
         const data = await res.json();
         if (data.ready) {
             modelReady = true;
             modelBanner.classList.add("ready");
-            modelBanner.querySelector("span").textContent = "Model loaded and ready!";
+            modelBannerText.textContent = currentMode === "local"
+                ? "Connected to local server!"
+                : "Cloud server ready!";
             dropZone.style.opacity = "1";
             dropZone.style.pointerEvents = "auto";
             setTimeout(() => { modelBanner.style.display = "none"; }, 2000);
-        } else { setTimeout(checkModel, 2000); }
-    } catch { setTimeout(checkModel, 3000); }
+        } else {
+            setTimeout(checkModel, 2000);
+        }
+    } catch {
+        modelBanner.classList.remove("ready");
+        modelBanner.classList.add("error");
+        if (currentMode === "local") {
+            modelBannerText.textContent = "Can't connect to localhost:5000. Start local server first: python app.py";
+        } else {
+            modelBannerText.textContent = "Cloud server is waking up... Please wait (may take 30-60s)";
+        }
+        setTimeout(checkModel, 3000);
+    }
 }
-
-modelBanner.classList.add("visible");
-dropZone.style.opacity = "0.5";
-dropZone.style.pointerEvents = "none";
-checkModel();
 
 // --- Drag & Drop ---
 dropZone.addEventListener("click", () => { if (!modelReady) return; fileInput.click(); });

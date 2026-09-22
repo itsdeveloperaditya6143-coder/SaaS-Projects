@@ -7,10 +7,11 @@
     <link rel="stylesheet" href="static/style.css">
 </head>
 <body>
-    <div class="container">
+    <!-- MODE SELECTION LANDING -->
+    <div class="container" id="landingPage">
         <header>
             <div class="logo">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="18" height="18" rx="2"/>
                     <path d="M9 3v18"/>
                     <path d="M3 9h6"/>
@@ -20,12 +21,97 @@
                 </svg>
                 <h1>BulkBGRemover</h1>
             </div>
-            <p class="tagline">Remove backgrounds instantly. Free. Unlimited. Offline.</p>
+            <p class="tagline">Remove backgrounds instantly. Free. Unlimited.</p>
+        </header>
+
+        <div class="mode-grid">
+            <!-- Cloud Mode -->
+            <div class="mode-card" id="cloudCard">
+                <div class="mode-icon cloud">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>
+                    </svg>
+                </div>
+                <h2>Cloud Based</h2>
+                <p class="mode-desc">Use online. No setup needed. Just open and start.</p>
+                <ul class="mode-features">
+                    <li>Works in any browser</li>
+                    <li>No installation required</li>
+                    <li>Unlimited processing</li>
+                    <li>Requires internet</li>
+                </ul>
+                <button class="btn btn-primary mode-btn" onclick="selectMode('cloud')">
+                    Open Online
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+            <!-- Local Mode -->
+            <div class="mode-card" id="localCard">
+                <div class="mode-icon local">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <rect x="2" y="3" width="20" height="14" rx="2"/>
+                        <line x1="8" y1="21" x2="16" y2="21"/>
+                        <line x1="12" y1="17" x2="12" y2="21"/>
+                    </svg>
+                </div>
+                <h2>Install Locally</h2>
+                <p class="mode-desc">Run offline on your computer. 100% private.</p>
+                <ul class="mode-features">
+                    <li>Works offline</li>
+                    <li>Images never leave your PC</li>
+                    <li>Unlimited processing</li>
+                    <li>Requires Python installed</li>
+                </ul>
+                <div class="mode-setup" id="localSetup">
+                    <div class="setup-steps">
+                        <code>git clone https://github.com/itsdeveloperaditya6143-coder/SaaS-Projects.git</code>
+                        <code>cd SaaS-Projects/bulkbgremover</code>
+                        <code>pip install -r requirements.txt</code>
+                        <code>python app.py</code>
+                    </div>
+                </div>
+                <button class="btn btn-outline mode-btn" onclick="selectMode('local')">
+                    Connect Local Server
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <footer>
+            <p>BulkBGRemover &mdash; Built with Python + U&sup2;-Net. Free forever.</p>
+        </footer>
+    </div>
+
+    <!-- APP (hidden until mode selected) -->
+    <div class="container" id="appPage" style="display:none">
+        <header>
+            <div class="logo-row">
+                <button class="btn btn-outline btn-sm" id="backToModes">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5"/>
+                        <path d="M12 19l-7-7 7-7"/>
+                    </svg>
+                    Switch Mode
+                </button>
+                <div class="logo">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M9 3v18"/>
+                        <path d="M3 9h6"/>
+                        <path d="M3 15h6"/>
+                        <circle cx="16" cy="12" r="2"/>
+                        <path d="M18 18l-4-4"/>
+                    </svg>
+                    <h1>BulkBGRemover</h1>
+                </div>
+                <div class="mode-badge" id="modeBadge">CLOUD</div>
+            </div>
         </header>
 
         <div class="model-banner" id="modelBanner">
             <div class="spinner"></div>
-            <span>Loading AI model (first time only)...</span>
+            <span id="modelBannerText">Connecting to server...</span>
         </div>
 
         <div class="upload-zone" id="dropZone">
@@ -72,7 +158,6 @@
         <!-- Editor Section -->
         <div class="editor-section" id="editorSection">
             <div class="editor-layout">
-                <!-- Left: Images -->
                 <div class="editor-left">
                     <div class="editor-left-header">
                         <h2>Edit Result</h2>
@@ -93,10 +178,8 @@
                     </div>
                 </div>
 
-                <!-- Right: Controls -->
                 <div class="editor-right">
                     <div class="editor-right-scroll">
-                        <!-- Background Picker -->
                         <div class="bg-picker-section">
                             <div class="bg-tabs">
                                 <button class="bg-tab active" data-tab="transparent">Transparent</button>
@@ -185,7 +268,6 @@
                             </div>
                         </div>
 
-                        <!-- Download -->
                         <div class="download-section">
                             <div class="download-options">
                                 <a class="download-btn" id="downloadPng" download>
@@ -233,10 +315,6 @@
 
         <div class="error-toast" id="errorToast" style="display:none"></div>
     </div>
-
-    <footer>
-        <p>BulkBGRemover &mdash; Built with Python + U&sup2;-Net. 100% local. No uploads to any server.</p>
-    </footer>
 
     <script src="static/config.js"></script>
     <script src="static/script.js"></script>
