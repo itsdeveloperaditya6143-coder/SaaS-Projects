@@ -1,1 +1,1 @@
-const API_URL = "https://bulkbgremover.onrender.com";
+const API_URL = "https://bulkbgremover-backend.onrender.com";
