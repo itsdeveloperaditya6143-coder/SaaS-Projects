@@ -1,0 +1,4 @@
+flask
+rembg[gpu]
+Pillow
+numpy
