@@ -1,4 +1,6 @@
 flask
-rembg[gpu]
+rembg
 Pillow
 numpy
+scipy
+gunicorn
