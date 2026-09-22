@@ -6,13 +6,13 @@ import json
 from flask import Flask, request, jsonify, send_file, render_template, Response
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-from remover import remove_background, preload_model, is_model_ready
+from remover import remove_background, is_model_ready
 
 app = Flask(__name__)
 CORS(app)
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
-app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "uploads")
-app.config["RESULT_FOLDER"] = os.path.join(os.path.dirname(__file__), "results")
+app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
+app.config["RESULT_FOLDER"] = os.path.join(os.path.dirname(os.path.abspath(__file__)), "results")
 
 os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 os.makedirs(app.config["RESULT_FOLDER"], exist_ok=True)
@@ -119,7 +119,6 @@ def remove_bulk_stream():
     batch_id = uuid.uuid4().hex[:8]
     total = len(valid_files)
 
-    # Pre-read all files before generator starts
     file_data = []
     for f in valid_files:
         file_data.append({
@@ -171,7 +170,7 @@ def remove_bulk_stream():
                 })
 
             except Exception as e:
-                errors.append({"original": secure_filename(f.filename), "error": str(e)})
+                errors.append({"original": fd["name"], "error": str(e)})
                 yield sse_event("image-error", {"index": i, "error": str(e)})
 
         zip_name = f"batch_{batch_id}.zip"
@@ -205,8 +204,3 @@ def download(filename):
     if not os.path.exists(path):
         return jsonify({"error": "File not found"}), 404
     return send_file(path, as_attachment=True)
-
-
-if __name__ == "__main__":
-    preload_model()
-    app.run(debug=True, port=5000)
