@@ -410,5 +410,43 @@
   $("installBtn2").addEventListener("click", doInstall);
   $("installClose").addEventListener("click", function () { $("installBanner").style.display = "none"; });
 
+  /* ---------- welcome popup (shows on open, closable after 5 sec) ---------- */
+  var WELCOME_KEY = "tweetsplit:hideWelcome";
+  var welcomeOverlay = $("welcomeOverlay"), welcomeClose = $("welcomeClose"), welcomeNever = $("welcomeNever");
+  var welcomeLeft = 5, welcomeTimer = null, welcomeDone = false;
+  function closeWelcome() {
+    if (!welcomeDone) return;
+    welcomeOverlay.style.display = "none";
+    clearInterval(welcomeTimer);
+    try {
+      if (welcomeNever && welcomeNever.checked) localStorage.setItem(WELCOME_KEY, "1");
+    } catch (e) {}
+  }
+  function openWelcome() {
+    var hide = false;
+    try { hide = localStorage.getItem(WELCOME_KEY) === "1"; } catch (e) {}
+    if (hide || !welcomeOverlay) return;
+    welcomeOverlay.style.display = "flex";
+    welcomeLeft = 5; welcomeDone = false;
+    welcomeClose.disabled = true;
+    welcomeClose.textContent = "Please wait… 5";
+    clearInterval(welcomeTimer);
+    welcomeTimer = setInterval(function () {
+      welcomeLeft--;
+      if (welcomeLeft <= 0) {
+        clearInterval(welcomeTimer);
+        welcomeDone = true;
+        welcomeClose.disabled = false;
+        welcomeClose.textContent = "Got it — let's split ✓";
+      } else {
+        welcomeClose.textContent = "Please wait… " + welcomeLeft;
+      }
+    }, 1000);
+  }
+  if (welcomeClose) welcomeClose.addEventListener("click", closeWelcome);
+  if (welcomeOverlay) welcomeOverlay.addEventListener("click", function (e) { if (e.target === welcomeOverlay) closeWelcome(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeWelcome(); });
+  setTimeout(openWelcome, 600);
+
   restore();
 })();

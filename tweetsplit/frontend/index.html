@@ -93,6 +93,22 @@
   </section>
 </main>
 
+<div id="welcomeOverlay" class="welcome-overlay" style="display:none">
+  <div class="welcome-modal" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="welcome-emoji">🧵</div>
+    <div id="welcomeTitle" class="welcome-title">Welcome to TweetSplit</div>
+    <div class="welcome-sub">Turn long text into a perfect X thread in 3 seconds.</div>
+    <div class="welcome-steps">
+      <div class="wstep"><span>1</span>Paste your long text in the box on the left.</div>
+      <div class="wstep"><span>2</span>We split it into 280-character tweets. Lists stay whole.</div>
+      <div class="wstep"><span>3</span>Edit or reorder any tweet in the preview.</div>
+      <div class="wstep"><span>4</span>Copy the full thread or post straight to X.</div>
+    </div>
+    <button id="welcomeClose" class="btn primary full" disabled>Please wait… 5</button>
+    <label class="welcome-never"><input type="checkbox" id="welcomeNever"> Don't show this again</label>
+  </div>
+</div>
+
 <div id="installBanner" class="install-banner" style="display:none">
   <div class="eicon">🧵</div>
   <div><b>Install TweetSplit</b><span>Add to home screen • works offline</span></div>
