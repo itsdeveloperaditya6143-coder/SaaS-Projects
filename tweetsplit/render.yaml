@@ -5,7 +5,7 @@
 #
 # This creates 2 services:
 #   1. tweetsplit-backend  (Python web service, serves API + fallback)
-#   2. tweetsplit-frontend (Static site, the actual UI)
+#   2. tweetsplit          (Static site, the actual UI - clean URL: tweetsplit.onrender.com)
 # The frontend works 100% standalone (all splitting is client-side),
 # backend is only needed for /api/split + share fallback.
 
@@ -25,7 +25,7 @@ services:
 
   # ---------- FRONTEND (Static) ----------
   - type: web
-    name: tweetsplit-frontend
+    name: tweetsplit
     env: static
     rootDir: tweetsplit/frontend
     buildCommand: echo "static site - no build needed"

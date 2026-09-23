@@ -19,7 +19,7 @@ python app.py
 
 ## Deploy on Render (Blueprint)
 - New → Blueprint → repo → Blueprint file: `tweetsplit/render.yaml`
-- Creates `tweetsplit-backend` (Python) + `tweetsplit-frontend` (Static)
+- Creates `tweetsplit-backend` (Python) + `tweetsplit` (Static, clean URL)
 
 ## API (optional, free)
 `POST /api/split` → `{ "text": "...", "max_len": 280, "numbering": true, "style": "start" }`
