@@ -1,0 +1,10 @@
+{
+  "name": "JSONView - Format, Validate and Convert JSON",
+  "short_name": "JSONView",
+  "description": "Paste JSON, format, validate, explore as tree, convert to YAML/CSV/Python. Free, no login.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}

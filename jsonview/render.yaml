@@ -1,0 +1,38 @@
+# JSONView — Render Blueprint
+# In Render dashboard: New > Blueprint > select repo SaaS-Projects
+# and set "Blueprint file" to: jsonview/render.yaml
+# (because repo root is Projects/, app lives in jsonview/)
+#
+# This creates 2 services:
+#   1. jsonview-backend  (Python web service, serves API + fallback)
+#   2. jsonview          (Static site, the actual UI - clean URL: jsonview.onrender.com)
+# The frontend works 100% standalone (all formatting is client-side),
+# backend is only needed for /api/format + share fallback.
+
+services:
+  # ---------- BACKEND (Flask) ----------
+  - type: web
+    name: jsonview-backend
+    env: python
+    rootDir: jsonview/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+  # ---------- FRONTEND (Static) ----------
+  - type: web
+    name: jsonview
+    env: static
+    rootDir: jsonview/frontend
+    buildCommand: echo "static site - no build needed"
+    staticPublishPath: ./
+    # No server-side routing needed (single index.html),
+    # but keep SPA fallback so refresh on any path works:
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

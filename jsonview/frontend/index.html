@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="JSONView" />
+<meta name="description" content="Paste JSON, format, validate, explore as tree, convert to YAML/CSV/Python. Free, no login, unlimited." />
+<title>JSONView - Format, Validate & Convert JSON Free</title>
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">🧩 JSONView</div>
+  <div class="tagline">Week 4 #buildinpublic by Aditya • JSON in → everything out</div>
+  <button id="installBtn" class="install-btn" style="display:none">📲 Install</button>
+  <span class="pill">v1.0 free • no login</span>
+</header>
+
+<main class="layout">
+  <section class="controls">
+    <div class="card" id="cardInput">
+      <div class="step"><span class="num">1</span> Your JSON</div>
+      <textarea id="jsonInput" spellcheck="false" maxlength="100000" placeholder='Paste JSON here... e.g. {"name": "aditya", "skills": ["python", "js"]}'></textarea>
+      <div class="row between small muted">
+        <span><span id="totalChars">0</span> chars</span>
+        <span><button id="sampleBtn" type="button" class="mini-btn">✨ sample</button>
+        <button id="uploadBtn" type="button" class="mini-btn">📂 upload</button>
+        <input type="file" id="fileInput" accept=".json,.txt,.yaml,.yml,.csv" style="display:none" />
+        <button id="clearBtn" type="button" class="mini-btn">✕ clear</button></span>
+      </div>
+      <div id="errBox" class="err-box" style="display:none"></div>
+      <div class="export-actions">
+        <button id="formatBtn" class="btn primary">✨ Format</button>
+        <button id="minifyBtn" class="btn ghost">Minify</button>
+      </div>
+      <div class="export-actions">
+        <button id="sortBtn" class="btn ghost">🔤 Sort keys</button>
+        <button id="validateBtn" class="btn ghost">✅ Validate</button>
+      </div>
+    </div>
+
+    <div class="card" id="cardConvert">
+      <div class="step"><span class="num">2</span> Convert &amp; export</div>
+      <div class="seg" id="convSeg">
+        <button type="button" data-conv="yaml" class="active">YAML</button>
+        <button type="button" data-conv="csv">CSV</button>
+        <button type="button" data-conv="python">Python</button>
+      </div>
+      <div class="export-actions">
+        <button id="copyOutBtn" class="btn primary">📋 Copy output</button>
+        <button id="downloadBtn" class="btn ghost">⬇️ File</button>
+      </div>
+      <div class="export-actions">
+        <button id="shareBtn" class="btn ghost">🔗 Share link</button>
+        <button id="copyPathHint" class="btn ghost" title="Click any key in Tree tab to copy its path">📍 Key path</button>
+      </div>
+      <div id="formatInfo" class="muted small" style="margin-top:8px;text-align:center">Tip: click any key in the Tree tab to copy its path</div>
+    </div>
+  </section>
+
+  <section class="preview">
+    <div class="preview-sticky">
+    <div class="card export-card">
+      <div class="step"><span class="live-pulse"></span> Output
+        <span class="tabs" id="tabBar">
+          <button type="button" data-tab="pretty" class="active">Pretty</button>
+          <button type="button" data-tab="tree">Tree</button>
+          <button type="button" data-tab="convert">Convert</button>
+        </span>
+      </div>
+      <div class="status-row">
+        <span id="statusPill" class="status-pill ok"><span class="dot"></span><span id="statusText">Empty • paste JSON to start</span></span>
+        <span id="statLine" class="muted small"></span>
+      </div>
+      <div class="tree-tools" id="treeTools" style="display:none">
+        <input id="searchInput" placeholder="🔍 search keys & values..." maxlength="100" />
+        <button id="expandBtn" type="button" class="mini-btn">Expand all</button>
+        <button id="collapseBtn" type="button" class="mini-btn">Collapse</button>
+      </div>
+      <div id="outWrap" class="out-wrap">
+        <pre id="prettyOut" class="pretty"><code id="prettyCode"></code></pre>
+        <div id="treeOut" class="tree" style="display:none"></div>
+        <pre id="convOut" class="pretty" style="display:none"><code id="convCode"></code></pre>
+        <div id="emptyState" class="empty">Formatted JSON will appear here...<br><span>Paste on the left → magic ✨</span></div>
+      </div>
+      <div id="toast" class="toast"></div>
+    </div>
+    <div class="footer">Built with Python + HTML/CSS/JS • Free • No login • #buildinpublic Week 4 • <a href="https://github.com/itsdeveloperaditya6143-coder/SaaS-Projects/tree/main/jsonview" target="_blank" rel="noopener">Open source on GitHub</a></div>
+    </div>
+  </section>
+</main>
+
+<div id="installBanner" class="install-banner" style="display:none">
+  <div class="eicon">🧩</div>
+  <div><b>Install JSONView</b><span>Add to home screen • works offline</span></div>
+  <button id="installBtn2">Install</button>
+  <button id="installClose" aria-label="Close">✕</button>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
