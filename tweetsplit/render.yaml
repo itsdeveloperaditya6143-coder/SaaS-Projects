@@ -1,0 +1,38 @@
+# TweetSplit — Render Blueprint
+# In Render dashboard: New > Blueprint > select repo SaaS-Projects
+# and set "Blueprint file" to: tweetsplit/render.yaml
+# (because repo root is Projects/, app lives in tweetsplit/)
+#
+# This creates 2 services:
+#   1. tweetsplit-backend  (Python web service, serves API + fallback)
+#   2. tweetsplit-frontend (Static site, the actual UI)
+# The frontend works 100% standalone (all splitting is client-side),
+# backend is only needed for /api/split + share fallback.
+
+services:
+  # ---------- BACKEND (Flask) ----------
+  - type: web
+    name: tweetsplit-backend
+    env: python
+    rootDir: tweetsplit/backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+
+  # ---------- FRONTEND (Static) ----------
+  - type: web
+    name: tweetsplit-frontend
+    env: static
+    rootDir: tweetsplit/frontend
+    buildCommand: echo "static site - no build needed"
+    staticPublishPath: ./
+    # No server-side routing needed (single index.html),
+    # but keep SPA fallback so refresh on any path works:
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

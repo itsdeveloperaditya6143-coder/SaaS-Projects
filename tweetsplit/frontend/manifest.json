@@ -1,0 +1,10 @@
+{
+  "name": "TweetSplit - Long Text to X Thread",
+  "short_name": "TweetSplit",
+  "description": "Paste long text, get a perfect X thread in 3 seconds. Free, no login.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000"
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="TweetSplit" />
+<meta name="description" content="Paste long text, get a perfect X thread in 3 seconds. Free, no login, unlimited." />
+<title>TweetSplit - Long Text to X Thread in 3 Sec</title>
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧵</text></svg>" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="logo">🧵 TweetSplit</div>
+  <div class="tagline">Week 3 #buildinpublic by Aditya • Long text → thread in 3 sec</div>
+  <button id="installBtn" class="install-btn" style="display:none">📲 Install</button>
+  <span class="pill">v1.0 free • no login</span>
+</header>
+
+<main class="layout">
+  <section class="controls">
+    <div class="card" id="cardInput">
+      <div class="step"><span class="num">1</span> Your long text</div>
+      <textarea id="longInput" spellcheck="true" maxlength="10000" placeholder="Paste your long post here... e.g. your build story, essay, announcement.&#10;&#10;We will auto-split it into 280-char tweets."></textarea>
+      <div class="row between small muted">
+        <span><span id="totalChars">0</span> chars • <span id="totalWords">0</span> words</span>
+        <span><button id="sampleBtn" type="button" class="mini-btn">✨ sample</button>
+        <button id="listDemoBtn" type="button" class="mini-btn">🔢 list demo</button>
+        <button id="pasteBtn" type="button" class="mini-btn">📋 paste</button>
+        <button id="clearBtn" type="button" class="mini-btn">✕ clear</button></span>
+      </div>
+      <button id="splitBtn" class="btn primary full">✂️ Split into thread</button>
+      <div id="formatInfo" class="muted small" style="margin-top:6px;text-align:center">Auto-splits as you type • edits below are kept until re-split</div>
+    </div>
+
+    <div class="card" id="cardSettings">
+      <div class="step"><span class="num">2</span> Settings <span class="live-dot">● live</span></div>
+      <div class="adv-group">
+        <label>Max chars per tweet</label>
+        <div class="seg" id="lenSeg">
+          <button type="button" data-len="250">250<span>safe</span></button>
+          <button type="button" data-len="270">270<span>numbered</span></button>
+          <button type="button" data-len="280" class="active">280<span>X limit</span></button>
+        </div>
+      </div>
+      <div class="adv-group">
+        <label>Thread numbering</label>
+        <div class="seg" id="styleSeg">
+          <button type="button" data-style="start" class="active">1/5 ...<span>start</span></button>
+          <button type="button" data-style="end">... 1/5<span>end</span></button>
+          <button type="button" data-style="none">none<span>clean</span></button>
+        </div>
+      </div>
+      <label class="toggle"><span>Auto-split while typing</span><input type="checkbox" id="optAuto" checked><i></i></label>
+      <label class="toggle"><span>🔒 Smart format lock <small style="display:block;font-size:11px;color:#71767b">lists (1. 2. • -) never break mid-point</small></span><input type="checkbox" id="optSmart" checked><i></i></label>
+    </div>
+
+    <div class="card" id="cardActions">
+      <div class="step"><span class="num">3</span> Copy &amp; post</div>
+      <div class="export-actions">
+        <button id="copyAllBtn" class="btn primary">📋 Copy thread</button>
+        <button id="postBtn" class="btn ghost">🐦 Post 1st on X</button>
+      </div>
+      <div class="export-actions">
+        <button id="downloadBtn" class="btn ghost">⬇️ .txt</button>
+        <button id="shareBtn" class="btn ghost">🔗 Share link</button>
+      </div>
+      <div class="muted small" style="margin-top:8px">Copy thread = numbered tweets separated for easy posting. Share link = anyone opens your exact text.</div>
+    </div>
+  </section>
+
+  <section class="preview">
+    <div class="preview-sticky">
+    <div class="card export-card">
+      <div class="step"><span class="live-pulse"></span> Live thread preview</div>
+      <div class="status-row">
+        <span id="statusPill" class="status-pill ok"><span class="dot"></span><span id="statusText">Empty • paste text to start</span></span>
+        <button id="addBtn" type="button" class="mini-btn">＋ add tweet</button>
+      </div>
+      <div id="threadList" class="thread-list">
+        <div id="emptyState" class="empty">Your thread tweets will appear here...<br><span>Paste text on the left → magic ✨</span></div>
+      </div>
+      <div id="toast" class="toast"></div>
+    </div>
+    <div class="footer">Built with Python + HTML/CSS/JS • Free • No login • #buildinpublic Week 3 • <a href="https://github.com" target="_blank" rel="noopener">Open source</a></div>
+    </div>
+  </section>
+</main>
+
+<div id="installBanner" class="install-banner" style="display:none">
+  <div class="eicon">🧵</div>
+  <div><b>Install TweetSplit</b><span>Add to home screen • works offline</span></div>
+  <button id="installBtn2">Install</button>
+  <button id="installClose" aria-label="Close">✕</button>
+</div>
+
+<script src="./app.js"></script>
+</body>
+</html>
